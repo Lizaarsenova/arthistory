@@ -23,68 +23,66 @@ def destroy_main_window():
 def create_author_window(author_slovar, logo_author, author_text):
     global button_back,button_1, button_2, button_3, label_author, label_1, label_2, label_3, text_author, top_frame, button_frame
 
-    top_frame=tk.Frame(root, bg="blue")
+    top_frame=tk.Frame(root)
     top_frame.place(relwidth=1, relheight=0.5, relx=0, rely=0)
 
 
 
-    top_frame_left=tk.Frame(top_frame, bg="green")
+    top_frame_left=tk.Frame(top_frame)
     top_frame_left.place(relwidth=0.3333, relheight=1, relx=0, rely=0)
 
-    top_frame_centre=tk.Frame(top_frame, bg="grey")
+    top_frame_centre=tk.Frame(top_frame)
     top_frame_centre.place(relwidth=0.3333, relheight=1, relx=0.3333, rely=0)
 
-    top_frame_right=tk.Frame(top_frame, bg="orange")
+    top_frame_right=tk.Frame(top_frame)
     top_frame_right.place(relwidth=0.3333, relheight=1, relx=0.66, rely=0)
 
-    button_frame=tk.Frame(root, bg="red")
+    button_frame=tk.Frame(root)
     button_frame.place(relwidth=1, relheight=0.5, relx=0, rely=0.5)
 
     
-    button_frame_left=tk.Frame(button_frame, bg="red")
+    button_frame_left=tk.Frame(button_frame)
     button_frame_left.place(relwidth=0.3333, relheight=1, relx=0, rely=0)
 
-    button_frame_centre=tk.Frame(button_frame, bg="purple")
+    button_frame_centre=tk.Frame(button_frame)
     button_frame_centre.place(relwidth=0.3333, relheight=1, relx=0.3333, rely=0)
 
-    buttton_frame_right=tk.Frame(button_frame, bg="pink")
+    buttton_frame_right=tk.Frame(button_frame)
     buttton_frame_right.place(relwidth=0.3333, relheight=1, relx=0.66, rely=0)
 
-    button_back=tk.Button(root, text="back",  font=("Arial",20))
-    button_back.grid(row=0, column=0, sticky="nw")
+    button_back=tk.Button(top_frame_left, text="back",  font=("Arial",20))
+    button_back.place(relwidth=0.2, relheight=0.1, relx=0, rely=0)
 
     image_author=tk.PhotoImage(file=logo_author)
     label_author=tk.Label(top_frame_centre, image=image_author)
     label_author.image=image_author
-    label_author.grid(row=0, column=5, columnspan=2,rowspan=5, sticky="nsew")
+    label_author.place(relwidth=0.9, relheight=0.9, relx=0.05, rely=0.05)
 
     keys_author_slovar=list(author_slovar.keys())
     image_1=tk.PhotoImage(file=keys_author_slovar[0])
     label_1=tk.Label(button_frame_left, image=image_1)
     label_1.image=image_1
-    label_1.grid(row=7, column=1, columnspan=2,rowspan=5, sticky="nsw")
+    label_1.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
     image_2=tk.PhotoImage(file=keys_author_slovar[1])
     label_2=tk.Label(button_frame_centre, image=image_2)
     label_2.image=image_2
-    label_2.grid(row=7, column=5, columnspan=2,rowspan=5, sticky="nsew")
+    label_2.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
     image_3=tk.PhotoImage(file=keys_author_slovar[2])
     label_3=tk.Label(buttton_frame_right, image=image_3)
     label_3.image=image_3
-    label_3.grid(row=7, column=9, columnspan=2,rowspan=5, sticky="ens")
+    label_3.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
     button_1=tk.Button(button_frame_left, font=("Arial",15), text="подробнее")
-    button_1.grid(row=12, column=2, sticky="ne")
-
+    button_1.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
     button_2=tk.Button(button_frame_centre, font=("Arial",15), text="подробнее")
-    button_2.grid(row=12, column=6, sticky="ne")
-
+    button_2.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
     button_3=tk.Button(buttton_frame_right, font=("Arial",15), text="подробнее")
-    button_3.grid(row=12, column=10, sticky="ne")
+    button_3.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
     
     text_author=tk.Label(top_frame_right, text=author_text, font=("Arial",20), wraplength=600)
-    text_author.grid(row=2, column=9, columnspan=4, sticky="nsew")
+    text_author.place(relwidth=1, relheight=1, relx=0, rely=0)
 
 def search():
     global main_frame_fale_text
