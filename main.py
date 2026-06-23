@@ -1,6 +1,7 @@
 
 import tkinter as tk
 import os
+import PIL
 
 def create_main_window():
     global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label
@@ -20,14 +21,19 @@ def destroy_main_window():
     if main_frame_fale_text!=None:
         main_frame_fale_text.destroy()
 
+def destroy_author_window():
+    global top_frame, button_frame
+    top_frame.destroy()
+    button_frame.destroy()
+    create_main_window()
+
+
 def create_author_window(author_slovar, logo_author, author_text):
     global button_back,button_1, button_2, button_3, label_author, label_1, label_2, label_3, text_author, top_frame, button_frame
 
     top_frame=tk.Frame(root)
     top_frame.place(relwidth=1, relheight=0.5, relx=0, rely=0)
-
-
-
+ 
     top_frame_left=tk.Frame(top_frame)
     top_frame_left.place(relwidth=0.3333, relheight=1, relx=0, rely=0)
 
@@ -50,7 +56,7 @@ def create_author_window(author_slovar, logo_author, author_text):
     buttton_frame_right=tk.Frame(button_frame)
     buttton_frame_right.place(relwidth=0.3333, relheight=1, relx=0.66, rely=0)
 
-    button_back=tk.Button(top_frame_left, text="back",  font=("Arial",20))
+    button_back=tk.Button(top_frame_left, text="back",  font=("Arial",20), command=destroy_author_window)
     button_back.place(relwidth=0.2, relheight=0.1, relx=0, rely=0)
 
     image_author=tk.PhotoImage(file=logo_author)
@@ -74,7 +80,7 @@ def create_author_window(author_slovar, logo_author, author_text):
     label_3.image=image_3
     label_3.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
-    button_1=tk.Button(button_frame_left, font=("Arial",15), text="подробнее")
+    button_1=tk.Button(button_frame_left, font=("Arial",15), text="подробнее", command=lambda:create_top_window_for_picture(image_1, author_slovar[keys_author_slovar[0]]))
     button_1.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
     button_2=tk.Button(button_frame_centre, font=("Arial",15), text="подробнее")
     button_2.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
@@ -83,6 +89,17 @@ def create_author_window(author_slovar, logo_author, author_text):
     
     text_author=tk.Label(top_frame_right, text=author_text, font=("Arial",20), wraplength=600)
     text_author.place(relwidth=1, relheight=1, relx=0, rely=0)
+
+def create_top_window_for_picture(top_window_picture, top_window_text):
+    top_window=tk.Toplevel()
+    top_window.title("подробнее")
+    top_window.geometry("1000x1000+800+300")
+    top_window_top_frame=tk.Frame(top_window, bg="grey")
+    top_window_top_frame.place(relheight=0.7, relwidth=1, relx=0, rely=0)
+    top_window_button_frame=tk.Frame(top_window, bg="green")
+    top_window_button_frame.place(relheight=0.3, relwidth=1, relx=0, rely=0.7)
+    top_window_label_1=tk.Label(top_window_top_frame, image=top_window_picture)
+    top_window_label_1.place(relheight=0.9, relwidth=0.9, relx=0.05, rely=0.05)
 
 def search():
     global main_frame_fale_text
@@ -159,6 +176,8 @@ label_3=None
 text_author=None
 top_frame=None
 button_frame=None
+top_frame=None
+button_frame=None
 
 main_frame_label=None
 main_frame_entry=None
@@ -166,7 +185,7 @@ main_frame_button=None
 main_frame_fale_text=None
 
 root=tk.Tk()
-root.title("title")
+root.title("история искусства")
 root.geometry("2000x1100")
 for i in range(12):
     root.columnconfigure(i, weight=1)
