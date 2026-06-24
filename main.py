@@ -1,7 +1,7 @@
 
 import tkinter as tk
 import os
-import PIL
+from PIL import Image, ImageTk
 
 def create_main_window():
     global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label
@@ -28,7 +28,7 @@ def destroy_author_window():
     create_main_window()
 
 
-def create_author_window(author_slovar, logo_author, author_text):
+def create_author_window(author_slovar_name, author_slovar_text, logo_author, author_name, author_text):
     global button_back,button_1, button_2, button_3, label_author, label_1, label_2, label_3, text_author, top_frame, button_frame
 
     top_frame=tk.Frame(root)
@@ -59,47 +59,71 @@ def create_author_window(author_slovar, logo_author, author_text):
     button_back=tk.Button(top_frame_left, text="back",  font=("Arial",20), command=destroy_author_window)
     button_back.place(relwidth=0.2, relheight=0.1, relx=0, rely=0)
 
-    image_author=tk.PhotoImage(file=logo_author)
+    pil_image_author=Image.open(logo_author)
+    pil_image_author.thumbnail((9999999999999999999999999999,480))
+    image_author=ImageTk.PhotoImage(pil_image_author)
     label_author=tk.Label(top_frame_centre, image=image_author)
     label_author.image=image_author
     label_author.place(relwidth=0.9, relheight=0.9, relx=0.05, rely=0.05)
 
-    keys_author_slovar=list(author_slovar.keys())
-    image_1=tk.PhotoImage(file=keys_author_slovar[0])
+    keys_author_slovar=list(author_slovar_name.keys())
+
+    pil_image_1=Image.open(keys_author_slovar[0])
+    pil_image_1.thumbnail((530,430))
+    image_1=ImageTk.PhotoImage(pil_image_1)
+    image_1.pil_base=pil_image_1
     label_1=tk.Label(button_frame_left, image=image_1)
     label_1.image=image_1
     label_1.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
-    image_2=tk.PhotoImage(file=keys_author_slovar[1])
+    pil_image_2=Image.open(keys_author_slovar[1])
+    pil_image_2.thumbnail((530,430))
+    image_2=ImageTk.PhotoImage(pil_image_2)
+    image_2.pil_base=pil_image_2
     label_2=tk.Label(button_frame_centre, image=image_2)
     label_2.image=image_2
     label_2.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
-    image_3=tk.PhotoImage(file=keys_author_slovar[2])
+    pil_image_3=Image.open(keys_author_slovar[2])
+    pil_image_3.thumbnail((530,430))
+    image_3=ImageTk.PhotoImage(pil_image_3)
+    image_3.pil_base=pil_image_3
     label_3=tk.Label(buttton_frame_right, image=image_3)
     label_3.image=image_3
     label_3.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
-    button_1=tk.Button(button_frame_left, font=("Arial",15), text="подробнее", command=lambda:create_top_window_for_picture(image_1, author_slovar[keys_author_slovar[0]]))
+    button_1=tk.Button(button_frame_left, font=("Arial",15), text="подробнее", command=lambda:create_top_window_for_picture(image_1, author_slovar_name[keys_author_slovar[0]], author_slovar_text[keys_author_slovar[0]]))
     button_1.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
-    button_2=tk.Button(button_frame_centre, font=("Arial",15), text="подробнее")
+    button_2=tk.Button(button_frame_centre, font=("Arial",15), text="подробнее", command=lambda:create_top_window_for_picture(image_2, author_slovar_name[keys_author_slovar[1]], author_slovar_text[keys_author_slovar[1]]))
     button_2.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
-    button_3=tk.Button(buttton_frame_right, font=("Arial",15), text="подробнее")
+    button_3=tk.Button(buttton_frame_right, font=("Arial",15), text="подробнее", command=lambda:create_top_window_for_picture(image_3, author_slovar_name[keys_author_slovar[2]], author_slovar_text[keys_author_slovar[2]]))
     button_3.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
-    
-    text_author=tk.Label(top_frame_right, text=author_text, font=("Arial",20), wraplength=600)
-    text_author.place(relwidth=1, relheight=1, relx=0, rely=0)
 
-def create_top_window_for_picture(top_window_picture, top_window_text):
+    text_name_author=tk.Label(top_frame_right, text=author_name, font=("Arial",20), wraplength=600, anchor="s")
+    text_name_author.place(relwidth=1, relheight=0.2, relx=0, rely=0)
+    text_author=tk.Label(top_frame_right, text=author_text, font=("Arial",20), wraplength=600)
+    text_author.place(relwidth=1, relheight=0.8, relx=0, rely=0.2)
+
+def create_top_window_for_picture(top_window_picture, top_window_name, top_window_text):
     top_window=tk.Toplevel()
     top_window.title("подробнее")
-    top_window.geometry("1000x1000+800+300")
-    top_window_top_frame=tk.Frame(top_window, bg="grey")
+    top_window.geometry("1000x1200+400+10")
+    top_window_top_frame=tk.Frame(top_window)
     top_window_top_frame.place(relheight=0.7, relwidth=1, relx=0, rely=0)
-    top_window_button_frame=tk.Frame(top_window, bg="green")
+    top_window_button_frame=tk.Frame(top_window)
     top_window_button_frame.place(relheight=0.3, relwidth=1, relx=0, rely=0.7)
-    top_window_label_1=tk.Label(top_window_top_frame, image=top_window_picture)
+    new=top_window_picture.pil_base
+    width=int(new.width*1.67)
+    height=int(new.height*1.67)
+    top_window_picture_new=new.resize((width, height))
+    top_window_picture_new2=ImageTk.PhotoImage(top_window_picture_new)
+    top_window_label_1=tk.Label(top_window_top_frame, image=top_window_picture_new2, anchor="s")
+    top_window_label_1.image=top_window_picture_new2
     top_window_label_1.place(relheight=0.9, relwidth=0.9, relx=0.05, rely=0.05)
+    top_window_text=tk.Label(top_window_button_frame, text=top_window_text,  font=("Arial",20), wraplength=1000, anchor="n")
+    top_window_text.place(relheight=0.8, relwidth=1, relx=0, rely=0.2)
+    top_window_name=tk.Label(top_window_button_frame, text=top_window_name,  font=("Arial",20), wraplength=1000, anchor="s")
+    top_window_name.place(relheight=0.2, relwidth=1, relx=0, rely=0)
 
 def search():
     global main_frame_fale_text
@@ -138,22 +162,26 @@ def search():
         with open(config_author, "r", encoding="utf-8") as file:
             data=file.readlines()
         # print(data)
-        author_slovar={}
+        author_slovar_name={}
+        author_slovar_text={}
         for i in data:
             i=i.strip().split(";")
             if i[0]=="1":
                 logo_author=i[1]
-                author_text=i[2]
+                author_name=i[2]
+                author_text=i[3]
                 # print("AUTHOR LOGO", logo_author)
                 # print("AUTHOR TEXT", author_text)
             elif i[0]=="2":
-                author_slovar[i[1]]=i[2]
-        if not logo_author or not author_text or not len(author_slovar)==3:
+                author_slovar_name[i[1]]=i[2]
+                author_slovar_text[i[1]]=i[3]
+        if not logo_author or not author_text or not len(author_slovar_name)==3 or not len(author_slovar_text)==3:
             main_frame_fale_text=tk.Label(root, text="повреждены данные", font=("Arial",30))
             main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
             return   
         destroy_main_window()
-        create_author_window(author_slovar, logo_author, author_text)
+        create_author_window(author_slovar_name, author_slovar_text, logo_author, author_name, author_text)
+       
                 
 
     else:
