@@ -4,7 +4,7 @@ import os
 from PIL import Image, ImageTk
 
 def create_main_window():
-    global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label
+    global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label, main_frame_authors_button
     main_frame_label=tk.Label(root, text="мое приложение", font=("Arial",40))
     main_frame_label.grid(row=3, column=0, columnspan=12, sticky="nsew", rowspan=2)
 
@@ -14,18 +14,65 @@ def create_main_window():
     main_frame_button=tk.Button(root, text="поиск", font=("Arial",30), command=search)
     main_frame_button.grid(row=7, column=9, sticky="nsew")
 
+    main_frame_authors_button=tk.Button(root,text="список авторов", font=("Arial",15), command=open_autors_frame)
+    main_frame_authors_button.grid(row=0, column=0, sticky="nw" )
+
 def destroy_main_window():
+    main_frame_authors_button.destroy()
     main_frame_label.destroy()
     main_frame_button.destroy()
     main_frame_entry.destroy()
     if main_frame_fale_text!=None:
         main_frame_fale_text.destroy()
 
+def destroy_all_authors():
+    global all_authors_frame
+    if all_authors_frame!=None:
+        all_authors_frame.destroy()
+
 def destroy_author_window():
     global top_frame, button_frame
     top_frame.destroy()
     button_frame.destroy()
+    destroy_all_authors()
     create_main_window()
+
+def open_autors_frame():
+    global all_authors_frame
+    destroy_main_window()
+    all_authors_frame=tk.Frame(root, bg="grey")
+    all_authors_frame.place(relwidth=1, relheight=1, relx=0, rely=0)
+    authors_canvas=tk.Canvas(all_authors_frame, bg="green")
+    authors_canvas.place(relwidth=0.985, relheight=0.3, relx=0.015, rely=0)
+    
+    authors_scrollbar=tk.Scrollbar(all_authors_frame, orient="vertical")
+    authors_scrollbar.place(relheight=1, relwidth=0.015, relx=0, rely=0)
+    authors_canvas.configure(yscrollcommand=authors_scrollbar.set)
+    authors_scrollbar.configure(command=authors_canvas.yview)
+
+    authors_frame=tk.Frame(authors_canvas)
+    authors_canvas.create_window((0,0), window=authors_frame, anchor="center")
+    authors_frame.bind("<Configure>", lambda x:authors_canvas.configure(scrollregion=authors_canvas.bbox("all")))
+
+    if not os.path.isfile(name_file_authors):
+        main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
+        main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
+        return
+
+    with open(name_file_authors, "r", encoding="utf-8") as file:
+        data=file.readlines()
+    del data[0]
+
+    author_slovar={}
+
+    for i in data:
+        i=i.strip().split(";")
+        author_slovar[i[0]]=i[1]
+    # print(author_slovar)
+    for i in author_slovar:
+        tk.Button(authors_frame, text=i.capitalize(), font=("Arial",30), width=85, command=lambda:search(i)).pack(fill="x", padx=5, pady=5, anchor="center")
+
+
 
 
 def create_author_window(author_slovar_name, author_slovar_text, logo_author, author_name, author_text):
@@ -125,9 +172,8 @@ def create_top_window_for_picture(top_window_picture, top_window_name, top_windo
     top_window_name=tk.Label(top_window_button_frame, text=top_window_name,  font=("Arial",20), wraplength=1000, anchor="s")
     top_window_name.place(relheight=0.2, relwidth=1, relx=0, rely=0)
 
-def search():
+def search(surname=None):
     global main_frame_fale_text
-    name_file_authors=r"authors_directory.csv"
     if not os.path.isfile(name_file_authors):
         main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
         main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
@@ -142,8 +188,8 @@ def search():
     for i in data:
         i=i.strip().split(";")
         slovar[i[0]]=i[1]
-
-    surname=main_frame_entry.get().strip().lower()
+    if surname==None:
+        surname=main_frame_entry.get().strip().lower()
     # print(slovar)
     if surname in slovar:
         if not os.path.isdir(slovar[surname]):
@@ -180,6 +226,7 @@ def search():
             main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
             return   
         destroy_main_window()
+        destroy_all_authors()
         create_author_window(author_slovar_name, author_slovar_text, logo_author, author_name, author_text)
        
                 
@@ -206,11 +253,15 @@ top_frame=None
 button_frame=None
 top_frame=None
 button_frame=None
+name_file_authors=r"authors_directory.csv"
 
 main_frame_label=None
 main_frame_entry=None
 main_frame_button=None
 main_frame_fale_text=None
+main_frame_authors_button=None
+
+all_authors_frame=None
 
 root=tk.Tk()
 root.title("история искусства")
