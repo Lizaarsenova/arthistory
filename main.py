@@ -69,8 +69,11 @@ def open_autors_frame():
         i=i.strip().split(";")
         author_slovar[i[0]]=i[1]
     # print(author_slovar)
-    for i in author_slovar:
-        tk.Button(authors_frame, text=i.capitalize(), font=("Arial",30), width=85, command=lambda:search(i)).pack(fill="x", padx=5, pady=5, anchor="center")
+    keys_author_slovar=list(author_slovar.keys())
+    # print(keys_author_slovar)
+    for i in keys_author_slovar:
+        tk.Button(authors_frame, text=i.capitalize(), font=("Arial",30), width=85, command=lambda arg=i :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
+        
 
 
 
