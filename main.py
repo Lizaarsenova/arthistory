@@ -40,13 +40,13 @@ def destroy_author_window():
 def open_autors_frame():
     global all_authors_frame
     destroy_main_window()
-    all_authors_frame=tk.Frame(root, bg="grey")
+    all_authors_frame=tk.Frame(root)
     all_authors_frame.place(relwidth=1, relheight=1, relx=0, rely=0)
-    authors_canvas=tk.Canvas(all_authors_frame, bg="green")
-    authors_canvas.place(relwidth=0.985, relheight=0.3, relx=0.015, rely=0)
+    authors_canvas=tk.Canvas(all_authors_frame, bg="grey")
+    authors_canvas.place(relwidth=0.95, relheight=0.95, relx=0.05, rely=0.05)
     
-    authors_scrollbar=tk.Scrollbar(all_authors_frame, orient="vertical")
-    authors_scrollbar.place(relheight=1, relwidth=0.015, relx=0, rely=0)
+    authors_scrollbar=tk.Scrollbar(all_authors_frame, orient="vertical", bg="silver")
+    authors_scrollbar.place(relheight=0.95, relwidth=0.05, relx=0, rely=0.05)
     authors_canvas.configure(yscrollcommand=authors_scrollbar.set)
     authors_scrollbar.configure(command=authors_canvas.yview)
 
@@ -79,7 +79,7 @@ def open_autors_frame():
 
 
 def create_author_window(author_slovar_name, author_slovar_text, logo_author, author_name, author_text):
-    global button_back,button_1, button_2, button_3, label_author, label_1, label_2, label_3, text_author, top_frame, button_frame
+    global button_back,button_1, button_2, button_3, label_author, label_1, label_2, label_3, text_author, top_frame, button_frame, top_window_name
 
     top_frame=tk.Frame(root)
     top_frame.place(relwidth=1, relheight=0.5, relx=0, rely=0)
@@ -100,8 +100,8 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
     button_frame_left=tk.Frame(button_frame)
     button_frame_left.place(relwidth=0.3333, relheight=1, relx=0, rely=0)
 
-    button_frame_centre=tk.Frame(button_frame)
-    button_frame_centre.place(relwidth=0.3333, relheight=1, relx=0.3333, rely=0)
+    button_frame_center=tk.Frame(button_frame)
+    button_frame_center.place(relwidth=0.3333, relheight=1, relx=0.3333, rely=0)
 
     buttton_frame_right=tk.Frame(button_frame)
     buttton_frame_right.place(relwidth=0.3333, relheight=1, relx=0.66, rely=0)
@@ -130,7 +130,7 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
     pil_image_2.thumbnail((530,430))
     image_2=ImageTk.PhotoImage(pil_image_2)
     image_2.pil_base=pil_image_2
-    label_2=tk.Label(button_frame_centre, image=image_2)
+    label_2=tk.Label(button_frame_center, image=image_2)
     label_2.image=image_2
     label_2.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
@@ -144,14 +144,21 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
 
     button_1=tk.Button(button_frame_left, font=("Arial",15), text="подробнее", command=lambda:create_top_window_for_picture(image_1, author_slovar_name[keys_author_slovar[0]], author_slovar_text[keys_author_slovar[0]]))
     button_1.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
-    button_2=tk.Button(button_frame_centre, font=("Arial",15), text="подробнее", command=lambda:create_top_window_for_picture(image_2, author_slovar_name[keys_author_slovar[1]], author_slovar_text[keys_author_slovar[1]]))
+    button_2=tk.Button(button_frame_center, font=("Arial",15), text="подробнее", command=lambda:create_top_window_for_picture(image_2, author_slovar_name[keys_author_slovar[1]], author_slovar_text[keys_author_slovar[1]]))
     button_2.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
     button_3=tk.Button(buttton_frame_right, font=("Arial",15), text="подробнее", command=lambda:create_top_window_for_picture(image_3, author_slovar_name[keys_author_slovar[2]], author_slovar_text[keys_author_slovar[2]]))
     button_3.place(relwidth=0.2, relheight=0.1, relx=0.7, rely=0.85)
 
+    name_1=tk.Label(button_frame_left, text=author_slovar_name[keys_author_slovar[0]],  font=("Arial",10), wraplength=1000, anchor="s")
+    name_1.place(relwidth=0.9, relheight=0.1, relx=0.05, rely=0)
+    name_2=tk.Label(button_frame_center, text=author_slovar_name[keys_author_slovar[1]],  font=("Arial",10), wraplength=1000, anchor="s")
+    name_2.place(relwidth=0.9, relheight=0.1, relx=0.05, rely=0)
+    name_3=tk.Label(buttton_frame_right, text=author_slovar_name[keys_author_slovar[2]],  font=("Arial",10), wraplength=1000, anchor="s")
+    name_3.place(relwidth=0.9, relheight=0.1, relx=0.05, rely=0)
+
     text_name_author=tk.Label(top_frame_right, text=author_name, font=("Arial",20), wraplength=600, anchor="s")
     text_name_author.place(relwidth=1, relheight=0.2, relx=0, rely=0)
-    text_author=tk.Label(top_frame_right, text=author_text, font=("Arial",20), wraplength=600)
+    text_author=tk.Label(top_frame_right, text=author_text, font=("Arial",17), wraplength=600)
     text_author.place(relwidth=1, relheight=0.8, relx=0, rely=0.2)
 
 def create_top_window_for_picture(top_window_picture, top_window_name, top_window_text):
@@ -170,7 +177,7 @@ def create_top_window_for_picture(top_window_picture, top_window_name, top_windo
     top_window_label_1=tk.Label(top_window_top_frame, image=top_window_picture_new2, anchor="s")
     top_window_label_1.image=top_window_picture_new2
     top_window_label_1.place(relheight=0.9, relwidth=0.9, relx=0.05, rely=0.05)
-    top_window_text=tk.Label(top_window_button_frame, text=top_window_text,  font=("Arial",20), wraplength=1000, anchor="n")
+    top_window_text=tk.Label(top_window_button_frame, text=top_window_text,  font=("Arial",15), wraplength=1000, anchor="n")
     top_window_text.place(relheight=0.8, relwidth=1, relx=0, rely=0.2)
     top_window_name=tk.Label(top_window_button_frame, text=top_window_name,  font=("Arial",20), wraplength=1000, anchor="s")
     top_window_name.place(relheight=0.2, relwidth=1, relx=0, rely=0)
