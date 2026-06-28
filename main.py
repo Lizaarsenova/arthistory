@@ -29,6 +29,7 @@ def destroy_all_authors():
     global all_authors_frame
     if all_authors_frame!=None:
         all_authors_frame.destroy()
+    create_main_window()
 
 def destroy_author_window():
     global top_frame, button_frame
@@ -49,6 +50,9 @@ def open_autors_frame():
     authors_scrollbar.place(relheight=0.95, relwidth=0.05, relx=0, rely=0.05)
     authors_canvas.configure(yscrollcommand=authors_scrollbar.set)
     authors_scrollbar.configure(command=authors_canvas.yview)
+
+    button_back=tk.Button(all_authors_frame, text="назад",  font=("Arial",20), command=destroy_all_authors, anchor="center")
+    button_back.place(relwidth=0.05, relheight=0.05, relx=0, rely=0)
 
     authors_frame=tk.Frame(authors_canvas)
     authors_canvas.create_window((0,0), window=authors_frame, anchor="center")
@@ -106,10 +110,10 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
     buttton_frame_right=tk.Frame(button_frame)
     buttton_frame_right.place(relwidth=0.3333, relheight=1, relx=0.66, rely=0)
 
-    button_back=tk.Button(top_frame_left, text="back",  font=("Arial",20), command=destroy_author_window)
+    button_back=tk.Button(top_frame_left, text="назад",  font=("Arial",20), command=destroy_author_window)
     button_back.place(relwidth=0.2, relheight=0.1, relx=0, rely=0)
 
-    pil_image_author=Image.open(logo_author)
+    pil_image_author=image_or_grey(logo_author, size=(530,480), color=(192,192, 192))
     pil_image_author.thumbnail((9999999999999999999999999999,480))
     image_author=ImageTk.PhotoImage(pil_image_author)
     label_author=tk.Label(top_frame_centre, image=image_author)
@@ -118,7 +122,7 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
 
     keys_author_slovar=list(author_slovar_name.keys())
 
-    pil_image_1=Image.open(keys_author_slovar[0])
+    pil_image_1=image_or_grey(keys_author_slovar[0], size=(530,430), color=(192,192, 192))
     pil_image_1.thumbnail((530,430))
     image_1=ImageTk.PhotoImage(pil_image_1)
     image_1.pil_base=pil_image_1
@@ -126,7 +130,7 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
     label_1.image=image_1
     label_1.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
-    pil_image_2=Image.open(keys_author_slovar[1])
+    pil_image_2=image_or_grey(keys_author_slovar[1], size=(530,430), color=(192,192, 192))
     pil_image_2.thumbnail((530,430))
     image_2=ImageTk.PhotoImage(pil_image_2)
     image_2.pil_base=pil_image_2
@@ -134,7 +138,7 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
     label_2.image=image_2
     label_2.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
-    pil_image_3=Image.open(keys_author_slovar[2])
+    pil_image_3=image_or_grey(keys_author_slovar[2], size=(530,430), color=(192,192, 192))
     pil_image_3.thumbnail((530,430))
     image_3=ImageTk.PhotoImage(pil_image_3)
     image_3.pil_base=pil_image_3
@@ -160,6 +164,17 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
     text_name_author.place(relwidth=1, relheight=0.2, relx=0, rely=0)
     text_author=tk.Label(top_frame_right, text=author_text, font=("Arial",17), wraplength=600)
     text_author.place(relwidth=1, relheight=0.8, relx=0, rely=0.2)
+
+def image_or_grey(image_path, size, color):
+    if os.path.isfile(image_path):
+        try:
+            img=Image.open(image_path)
+            img.load()
+            return img
+        except Exception:
+            return Image.new("RGB", size, color)
+    else:
+        return Image.new("RGB", size, color)
 
 def create_top_window_for_picture(top_window_picture, top_window_name, top_window_text):
     top_window=tk.Toplevel()
@@ -244,9 +259,7 @@ def search(surname=None):
     else:
         main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
         main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
-        return
-
-            
+        return           
 
 
 button_back=None
