@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 
 def create_main_window():
     global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label, main_frame_authors_button
-    main_frame_label=tk.Label(root, text="мое приложение", font=("Arial",40))
+    main_frame_label=tk.Label(root, text=f"Добро пожаловать{users_settings["LOGIN"]+',' if len(users_settings)!=0 and users_settings["LOGIN"]!="" else ""}!\nмое приложение", font=("Arial",40))
     main_frame_label.grid(row=3, column=0, columnspan=12, sticky="nsew", rowspan=2)
 
     main_frame_entry=tk.Entry(root, font=("Arial",30))
@@ -16,6 +16,8 @@ def create_main_window():
 
     main_frame_authors_button=tk.Button(root,text="список авторов", font=("Arial",15), command=open_autors_frame)
     main_frame_authors_button.grid(row=0, column=0, sticky="nw" )
+
+
 
 def destroy_main_window():
     main_frame_authors_button.destroy()
@@ -78,10 +80,6 @@ def open_autors_frame():
     for i in keys_author_slovar:
         tk.Button(authors_frame, text=i.capitalize(), font=("Arial",30), width=85, command=lambda arg=i :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
         
-
-
-
-
 def create_author_window(author_slovar_name, author_slovar_text, logo_author, author_name, author_text):
     global button_back,button_1, button_2, button_3, label_author, label_1, label_2, label_3, text_author, top_frame, button_frame, top_window_name
 
@@ -261,6 +259,83 @@ def search(surname=None):
         main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
         return           
 
+def start():
+    global entry_frame
+    entry_frame.destroy()
+    create_main_window()
+
+def check_log_in(entry_1, entry_2, info_label, log_in_toplevel):
+    login=entry_1.get()
+    password=entry_2.get()
+    if not os.path.isfile(accounts_path):
+        info_label.config(text="Не удается установить соединение с базой данных")
+        return
+    with open (accounts_path) as file:
+        data=file.readlines()
+    accounts={}
+    del data[0]
+    for i in data:
+        i=i.strip().split(";")
+        accounts[i[0]]=i[1]
+        print(accounts)
+    if login in accounts and password==accounts[login]:
+        log_in_toplevel.destroy()
+        users_settings["LOGIN"]=login
+        users_settings["LOGGED_IN"]="True"
+        write_in_logins_txt()
+        start()
+    else:
+        info_label.config(text="Неверные данные для входа")
+        
+
+def write_in_logins_txt():
+    with open(logins_file,"w") as file:
+        for i in users_settings:
+            file.write(f"{i}:{users_settings[i]}\n")
+    
+    
+def log_in():
+    log_in_toplevel=tk.Toplevel()
+    log_in_toplevel.title("вход")
+    log_in_toplevel.geometry("1000x1200+400+10")
+    entry_1=tk.Entry(log_in_toplevel)
+    entry_1.pack()
+    entry_2=tk.Entry(log_in_toplevel)
+    entry_2.pack()
+    info_label=tk.Label(log_in_toplevel)
+    info_label.pack()
+    entry_button=tk.Button(log_in_toplevel, text="войти", command=lambda:check_log_in(entry_1, entry_2, info_label, log_in_toplevel))
+    entry_button.pack()
+def main():
+    global entry_frame, users_settings
+    entry_frame=tk.Frame(root)
+    entry_frame.place(relheight=1,relwidth=1,relx=0,rely=0)
+    if not os.path.isfile(logins_file):
+        fale_label=tk.Label(entry_frame, text="На данный момент авторизация/регистрация невозможна.\nПродолжить без входа в аккаунт?")
+        fale_label.pack()
+        button_yes=tk.Button(entry_frame, text="да", command=start)
+        button_yes.pack()
+        button_no=tk.Button(entry_frame, text="нет", command=root.destroy)
+        button_no.pack()
+        return
+
+    with open(logins_file) as file:
+        data=file.readlines()
+        print(data)
+    for i in data:
+        i=i.strip().split(":")
+        users_settings[i[0]]=i[1]
+    # print(users_settings)
+    if users_settings["LOGGED_IN"]=="True":
+        start()
+    else:
+        button_log_in=tk.Button(entry_frame, text="войти", command=log_in)
+        button_log_in.pack()
+        button_sign_up=tk.Button(entry_frame, text="авторизоваться")
+        button_sign_up.pack()
+
+
+
 
 button_back=None
 button_1=None
@@ -285,6 +360,10 @@ main_frame_fale_text=None
 main_frame_authors_button=None
 
 all_authors_frame=None
+entry_frame=None
+users_settings={}
+logins_file="logins.txt"
+accounts_path="logins.csv"
 
 root=tk.Tk()
 root.title("история искусства")
@@ -294,7 +373,9 @@ for i in range(12):
     root.rowconfigure(i, weight=1)
 
 
-create_main_window()
+# create_main_window()
+main()
+
 
 root.mainloop()
 
