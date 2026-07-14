@@ -2,13 +2,14 @@
 import tkinter as tk
 import os
 from PIL import Image, ImageTk
+import customtkinter as ctk
 
 def create_main_window():
     global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label, main_frame_authors_button
-    main_frame_label=tk.Label(root, text=f"Добро пожаловать{users_settings["LOGIN"]+',' if len(users_settings)!=0 and users_settings["LOGIN"]!="" else ""}!\nмое приложение", font=("Arial",40))
+    main_frame_label=tk.Label(root, text=f"Добро пожаловать, {users_settings["LOGIN"] if len(users_settings)!=0 and users_settings["LOGIN"]!="" else ""}!\nмое приложение", font=("Arial",40))
     main_frame_label.grid(row=3, column=0, columnspan=12, sticky="nsew", rowspan=2)
 
-    main_frame_entry=tk.Entry(root, font=("Arial",30))
+    main_frame_entry=ctk.CTkEntry(root, placeholder_text="Введите фамилию художника", font=("Arial",50))
     main_frame_entry.grid(row=7, column=2, columnspan=7, sticky="nsew")
 
     main_frame_button=tk.Button(root, text="поиск", font=("Arial",30), command=search)
@@ -178,20 +179,23 @@ def create_top_window_for_picture(top_window_picture, top_window_name, top_windo
     top_window=tk.Toplevel()
     top_window.title("подробнее")
     top_window.geometry("1000x1200+400+10")
+
     top_window_top_frame=tk.Frame(top_window)
     top_window_top_frame.place(relheight=0.7, relwidth=1, relx=0, rely=0)
     top_window_button_frame=tk.Frame(top_window)
     top_window_button_frame.place(relheight=0.3, relwidth=1, relx=0, rely=0.7)
+
     new=top_window_picture.pil_base
     width=int(new.width*1.67)
     height=int(new.height*1.67)
     top_window_picture_new=new.resize((width, height))
+
     top_window_picture_new2=ImageTk.PhotoImage(top_window_picture_new)
     top_window_label_1=tk.Label(top_window_top_frame, image=top_window_picture_new2, anchor="s")
     top_window_label_1.image=top_window_picture_new2
     top_window_label_1.place(relheight=0.9, relwidth=0.9, relx=0.05, rely=0.05)
-    top_window_text=tk.Label(top_window_button_frame, text=top_window_text,  font=("Arial",15), wraplength=1000, anchor="n")
-    top_window_text.place(relheight=0.8, relwidth=1, relx=0, rely=0.2)
+    top_window_text=tk.Label(top_window_button_frame, text=top_window_text,  font=("Arial",15), wraplength=900, anchor="n")
+    top_window_text.place(relheight=0.8, relwidth=0.9, relx=0.05, rely=0.2)
     top_window_name=tk.Label(top_window_button_frame, text=top_window_name,  font=("Arial",20), wraplength=1000, anchor="s")
     top_window_name.place(relheight=0.2, relwidth=1, relx=0, rely=0)
 
@@ -264,9 +268,9 @@ def start():
     entry_frame.destroy()
     create_main_window()
 
-def check_log_in(entry_1, entry_2, info_label, log_in_toplevel):
-    login=entry_1.get()
-    password=entry_2.get()
+def check_log_in(entry_login, entry_password, info_label, log_in_toplevel):
+    login=entry_login.get()
+    password=entry_password.get()
     if not os.path.isfile(accounts_path):
         info_label.config(text="Не удается установить соединение с базой данных")
         return
@@ -295,28 +299,33 @@ def write_in_logins_txt():
     
     
 def log_in():
+    global log_in_toplevel
     log_in_toplevel=tk.Toplevel()
     log_in_toplevel.title("вход")
-    log_in_toplevel.geometry("1000x1200+400+10")
-    entry_1=tk.Entry(log_in_toplevel)
-    entry_1.pack()
-    entry_2=tk.Entry(log_in_toplevel)
-    entry_2.pack()
+    log_in_toplevel.geometry("1300x600+500+100")
+
+    entry_login=ctk.CTkEntry(log_in_toplevel, placeholder_text="Введите логин", font=("Arial",35))
+    entry_login.place(relheight=0.1, relwidth=0.7, rely=0.1, relx=0.15)
+    entry_password=ctk.CTkEntry(log_in_toplevel, placeholder_text="Введите пароль", font=("Arial",35))
+    entry_password.place(relheight=0.1, relwidth=0.7, rely=0.25, relx=0.15)
     info_label=tk.Label(log_in_toplevel)
     info_label.pack()
-    entry_button=tk.Button(log_in_toplevel, text="войти", command=lambda:check_log_in(entry_1, entry_2, info_label, log_in_toplevel))
-    entry_button.pack()
+    entry_button=tk.Button(log_in_toplevel, text="войти", command=lambda:check_log_in(entry_login, entry_password, info_label, log_in_toplevel), font=("Arial",25))
+    entry_button.place(relheight=0.1, relwidth=0.2, relx=0.4, rely=0.4)
+
+    back_to_main_button=tk.Button(log_in_toplevel, text="назад", font=("Arial",25), command=back_to_main)
+    back_to_main_button.place(relheight=0.08, relwidth=0.1, relx=0, rely=0)
 def main():
     global entry_frame, users_settings
     entry_frame=tk.Frame(root)
     entry_frame.place(relheight=1,relwidth=1,relx=0,rely=0)
     if not os.path.isfile(logins_file):
-        fale_label=tk.Label(entry_frame, text="На данный момент авторизация/регистрация невозможна.\nПродолжить без входа в аккаунт?")
-        fale_label.pack()
-        button_yes=tk.Button(entry_frame, text="да", command=start)
-        button_yes.pack()
-        button_no=tk.Button(entry_frame, text="нет", command=root.destroy)
-        button_no.pack()
+        fale_label=tk.Label(entry_frame, text="На данный момент авторизация/регистрация невозможна.\nПродолжить без входа в аккаунт?", font=("Arial",25))
+        fale_label.place(relheight=0.3, relwidth=0.9, relx=0.05, rely=0.1)
+        button_yes=tk.Button(entry_frame, text="да", command=start, font=("Arial",35), bg="#79D196")
+        button_yes.place(relheight=0.1, relwidth=0.1, relx=0.4, rely=0.3)
+        button_no=tk.Button(entry_frame, text="нет", command=root.destroy, font=("Arial",35), bg="#E2A3A3")
+        button_no.place(relheight=0.1, relwidth=0.1, relx=0.5, rely=0.3)
         return
 
     with open(logins_file) as file:
@@ -329,11 +338,15 @@ def main():
     if users_settings["LOGGED_IN"]=="True":
         start()
     else:
-        button_log_in=tk.Button(entry_frame, text="войти", command=log_in)
-        button_log_in.pack()
-        button_sign_up=tk.Button(entry_frame, text="авторизоваться")
-        button_sign_up.pack()
+        button_log_in=tk.Button(entry_frame, text="войти", command=log_in, font=("Arial",25))
+        button_log_in.place(relheight=0.08, relwidth=0.2, relx=0.25, rely=0.1)
+        button_sign_up=tk.Button(entry_frame, text="авторизоваться", font=("Arial",25))
+        button_sign_up.place(relheight=0.08, relwidth=0.2, relx=0.55, rely=0.1)
 
+def back_to_main():
+    global log_in_toplevel
+    log_in_toplevel.destroy()
+    main()
 
 
 
@@ -352,6 +365,7 @@ button_frame=None
 top_frame=None
 button_frame=None
 name_file_authors=r"authors_directory.csv"
+log_in_toplevel=None
 
 main_frame_label=None
 main_frame_entry=None
