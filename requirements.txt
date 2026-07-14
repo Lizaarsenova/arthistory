@@ -1,3 +1,7 @@
 nuitka>=2.0
+<<<<<<< HEAD
 pillow>=12.0
 customtkiner>=5.2
+=======
+pillow>=12.0
+>>>>>>> 56f36767b414261489cb07634c20e1f9a52e3a4a
