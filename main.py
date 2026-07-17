@@ -281,7 +281,7 @@ def check_log_in(entry_login, entry_password, info_label, log_in_toplevel):
     for i in data:
         i=i.strip().split(";")
         accounts[i[0]]=i[1]
-        print(accounts)
+    
     if login in accounts and password==accounts[login]:
         log_in_toplevel.destroy()
         users_settings["LOGIN"]=login
@@ -289,7 +289,7 @@ def check_log_in(entry_login, entry_password, info_label, log_in_toplevel):
         write_in_logins_txt()
         start()
     else:
-        info_label.config(text="Неверные данные для входа")
+        info_label.config(text="Неверные данные для входа", font=("Arial",35))
         
 
 def write_in_logins_txt():
@@ -309,11 +309,11 @@ def log_in():
     entry_password=ctk.CTkEntry(log_in_toplevel, placeholder_text="Введите пароль", font=("Arial",35))
     entry_password.place(relheight=0.1, relwidth=0.7, rely=0.25, relx=0.15)
     info_label=tk.Label(log_in_toplevel)
-    info_label.pack()
+    info_label.place(relheight=0.2, relwidth=1, relx=0, rely=0.6)
     entry_button=tk.Button(log_in_toplevel, text="войти", command=lambda:check_log_in(entry_login, entry_password, info_label, log_in_toplevel), font=("Arial",25))
     entry_button.place(relheight=0.1, relwidth=0.2, relx=0.4, rely=0.4)
 
-    back_to_main_button=tk.Button(log_in_toplevel, text="назад", font=("Arial",25), command=back_to_main)
+    back_to_main_button=tk.Button(log_in_toplevel, text="назад", font=("Arial",25), command=destroy_log_in_toplevel)
     back_to_main_button.place(relheight=0.08, relwidth=0.1, relx=0, rely=0)
 def main():
     global entry_frame, users_settings
@@ -330,7 +330,6 @@ def main():
 
     with open(logins_file) as file:
         data=file.readlines()
-        print(data)
     for i in data:
         i=i.strip().split(":")
         users_settings[i[0]]=i[1]
@@ -340,16 +339,76 @@ def main():
     else:
         button_log_in=tk.Button(entry_frame, text="войти", command=log_in, font=("Arial",25))
         button_log_in.place(relheight=0.08, relwidth=0.2, relx=0.25, rely=0.1)
-        button_sign_up=tk.Button(entry_frame, text="авторизоваться", font=("Arial",25))
+        button_sign_up=tk.Button(entry_frame, text="зарегистрироваться", font=("Arial",25), command=registration)
         button_sign_up.place(relheight=0.08, relwidth=0.2, relx=0.55, rely=0.1)
 
-def back_to_main():
+def destroy_log_in_toplevel():
     global log_in_toplevel
     log_in_toplevel.destroy()
     main()
 
+def show_password():
+    global entry_password_1, password_check_box_1
+    entry_password_1.configure(show="" if password_check_box_1.get() else "*")
 
+def registration():
+    global registration_toplevel, entry_password_1, password_check_box_1
+    registration_toplevel=tk.Toplevel()
+    registration_toplevel.title("регистрация")
+    registration_toplevel.geometry("1300x600+500+100")
 
+    back_to_main_button=tk.Button(registration_toplevel, text="назад", font=("Arial",25), command=destroy_registration_toplevel)
+    back_to_main_button.place(relheight=0.08, relwidth=0.1, relx=0, rely=0)
+
+    registration_label=tk.Label(registration_toplevel, text="регистрация", font=("Arial",25))
+    registration_label.place(relheight=0.1, relwidth=1, relx=0, rely=0.1)
+    
+    entry_login=ctk.CTkEntry(registration_toplevel, placeholder_text="Введите логин", font=("Arial",35))
+    entry_login.place(relheight=0.1, relwidth=0.7, rely=0.2, relx=0.15)
+    # entry_login.bind("<KeyRelease>", login_control)
+
+    entry_password_1=ctk.CTkEntry(registration_toplevel, placeholder_text="Введите пароль", font=("Arial",35), show="*")
+    entry_password_1.place(relheight=0.1, relwidth=0.7, rely=0.35, relx=0.15)
+
+    password_check_box_1=ctk.CTkCheckBox(registration_toplevel, text="", checkbox_height=60, checkbox_width=60, command=show_password, fg_color="#92C0DF", hover_color="#5972A0", border_color="#4B5A8B")
+    password_check_box_1.place(relheight=0.1, relwidth=0.1, relx=0.85, rely=0.35)
+
+    mistake_label=tk.Label(registration_toplevel, text="")
+    mistake_label.pack()
+
+    entry_password_2=ctk.CTkEntry(registration_toplevel, placeholder_text="Повторите пароль", font=("Arial",35), show="*")
+    entry_password_2.place(relheight=0.1, relwidth=0.7, rely=0.65, relx=0.15)
+    
+    registration_button=tk.Button(registration_toplevel, text="зарегистрироваться", font=("Arial",35), command=lambda: registre_control(entry_login, entry_password_1, entry_password_2, mistake_label))
+    registration_button.pack()
+     
+    rules_label=tk.Label(registration_toplevel, text="-не менее 8 символов\n-хотя бы одна заглавная буква", font=("Arial",15),fg="#5F5F5F", anchor="sw")
+    rules_label.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.45)
+def destroy_registration_toplevel():
+    global registration_topleve, log_in_toplevel
+    registration_toplevel.destroy()
+    log_in_toplevel.destroy()
+    main() 
+
+def registre_control(entry_login, entry_password_1, entry_password_2, mistake_label):
+    with open(accounts_path, "r", encoding="utf-8") as file:
+        data=file.readlines()
+    del data[0]
+    
+    logins={}
+
+    for i in data:
+        i=i.strip().split(";")
+        print(i)
+        logins[i[0]]=i[1]
+    print(logins)
+    
+
+    if  entry_password_1.get() != entry_password_2.get():
+        entry_password_1.configure(text_color="red")
+        entry_password_2.configure(text_color="red")
+        mistake_label.configure(text="Пароли не совпадают")
+        return
 button_back=None
 button_1=None
 button_2=None
@@ -366,6 +425,9 @@ top_frame=None
 button_frame=None
 name_file_authors=r"authors_directory.csv"
 log_in_toplevel=None
+registration_toplevel=None
+entry_password_1=None
+password_check_box_1=None
 
 main_frame_label=None
 main_frame_entry=None
