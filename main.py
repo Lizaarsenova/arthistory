@@ -374,7 +374,7 @@ def registration():
     password_check_box_1.place(relheight=0.1, relwidth=0.1, relx=0.85, rely=0.35)
 
     mistake_label=tk.Label(registration_toplevel, text="")
-    mistake_label.pack()
+    mistake_label.place(relheight=0.1, relwidth=1, rely=0.8, relx=0)
 
     entry_password_2=ctk.CTkEntry(registration_toplevel, placeholder_text="Повторите пароль", font=("Arial",35), show="*")
     entry_password_2.place(relheight=0.1, relwidth=0.7, rely=0.65, relx=0.15)
@@ -391,6 +391,16 @@ def destroy_registration_toplevel():
     main() 
 
 def registre_control(entry_login, entry_password_1, entry_password_2, mistake_label):
+
+    if entry_login.get()=="":
+        mistake_label.configure(text="заполните поле логина")
+        return
+    if entry_password_1.get()=="":
+        mistake_label.configure(text="заполните поле пароля")
+        return
+    # if entry_password_2.get()=="":
+    #     mistake_label.configure(text="заполните второе поле пароля")
+    #     return
     with open(accounts_path, "r", encoding="utf-8") as file:
         data=file.readlines()
     del data[0]
@@ -399,9 +409,28 @@ def registre_control(entry_login, entry_password_1, entry_password_2, mistake_la
 
     for i in data:
         i=i.strip().split(";")
+        logins.update({i[0]:i[1]})
         print(i)
-        logins[i[0]]=i[1]
     print(logins)
+
+    if entry_login.get() in logins:
+        mistake_label.configure(text="данный логин уже занят")
+        entry_login.configure(text_color="red")
+        return
+
+    parol_1=entry_password_1.get()
+    if len(parol_1)<8:
+        mistake_label.configure(text="недостаточно символов")
+        return
+    if not any(i in "!#@$%&^*+"  for i in parol_1):
+        mistake_label.configure(text="нет специальных символов")
+        return
+    if not any(i in "1234567890"  for i in parol_1):
+        mistake_label.configure(text="нет цифр")
+        return
+    if not any(i.isupper() and i.isalpha()  for i in parol_1):
+        mistake_label.configure(text="нет заглавной буквы")
+        return
     
 
     if  entry_password_1.get() != entry_password_2.get():
