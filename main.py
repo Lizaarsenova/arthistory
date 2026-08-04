@@ -12,6 +12,7 @@ def create_main_window():
 
     main_frame_entry=ctk.CTkEntry(root, placeholder_text="Введите фамилию художника", font=("Arial",50))
     main_frame_entry.grid(row=7, column=2, columnspan=7, sticky="nsew")
+    main_frame_entry.bind("<Button-1>", history_bar )
 
     main_frame_button=tk.Button(root, text="поиск", font=("Arial",30), command=search)
     main_frame_button.grid(row=7, column=9, sticky="nsew")
@@ -19,7 +20,14 @@ def create_main_window():
     main_frame_authors_button=tk.Button(root,text="список авторов", font=("Arial",15), command=open_autors_frame)
     main_frame_authors_button.grid(row=0, column=0, sticky="nw" )
 
-
+def history_bar(event):
+    history_scrollbar_frame=tk.Frame(root, bg="pink")
+    history_scrollbar_frame.place(relheight=0.1, relwidth=0.6, relx=0.2, rely=0.9)
+    history_scrollbar=tk.Scrollbar(history_scrollbar_frame, orient="vertical", bg="silver")
+    history_scrollbar.place(relheight=0.1, relwidth=0.01, relx=0.3, rely=0.8)
+    history_scrollbar_canvas=tk.Canvas(history_scrollbar_frame, bg="grey")
+    history_scrollbar_canvas.place(relheight=0.2, relwidth=0.7, relx=0.1, rely=0.2)
+    
 
 def destroy_main_window():
     main_frame_authors_button.destroy()
@@ -200,8 +208,24 @@ def create_top_window_for_picture(top_window_picture, top_window_name, top_windo
     top_window_name=tk.Label(top_window_button_frame, text=top_window_name,  font=("Arial",20), wraplength=1000, anchor="s")
     top_window_name.place(relheight=0.2, relwidth=1, relx=0, rely=0)
 
+def update_history(users_settings):
+    global main_frame_entry
+    if users_settings["HISTORY_1"]=="":
+        users_settings["HISTORY_1"]=main_frame_entry.get()
+    elif users_settings["HISTORY_1"]!="":
+        users_settings["HISTORY_5"]=users_settings["HISTORY_4"]
+        users_settings["HISTORY_4"]=users_settings["HISTORY_3"]
+        users_settings["HISTORY_3"]=users_settings["HISTORY_2"]
+        users_settings["HISTORY_2"]=users_settings["HISTORY_1"]
+        users_settings["HISTORY_1"]=main_frame_entry.get()
+    print(users_settings)
+
 def search(surname=None):
     global main_frame_fale_text
+
+    update_history(users_settings)
+    write_in_logins_txt()
+
     if not os.path.isfile(name_file_authors):
         main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
         main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
@@ -263,6 +287,7 @@ def search(surname=None):
         main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
         main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
         return           
+    
 
 def start():
     global entry_frame
@@ -429,18 +454,18 @@ def registre_control(entry_login, entry_password_1, entry_password_2, mistake_la
         return
 
     parol_1=entry_password_1.get()
-    # if len(parol_1)<8:
-    #     mistake_label.configure(text="недостаточно символов",font=("Arial",15))
-    #     return
-    # if not any(i in "!#@$%&^*+№;:^&?()-_=~`{[]}"  for i in parol_1):
-    #     mistake_label.configure(text="нет специальных символов",font=("Arial",15))
-    #     return
-    # if not any(i in "1234567890"  for i in parol_1):
-    #     mistake_label.configure(text="нет цифр",font=("Arial",15))
-    #     return
-    # if not any(i.isupper() and i.isalpha()  for i in parol_1):
-    #     mistake_label.configure(text="нет заглавной буквы",font=("Arial",15))
-    #     return
+    if len(parol_1)<8:
+        mistake_label.configure(text="недостаточно символов",font=("Arial",15))
+        return
+    if not any(i in "!#@$%&^*+№;:^&?()-_=~`{[]}"  for i in parol_1):
+        mistake_label.configure(text="нет специальных символов",font=("Arial",15))
+        return
+    if not any(i in "1234567890"  for i in parol_1):
+        mistake_label.configure(text="нет цифр",font=("Arial",15))
+        return
+    if not any(i.isupper() and i.isalpha()  for i in parol_1):
+        mistake_label.configure(text="нет заглавной буквы",font=("Arial",15))
+        return
     
 
     if  entry_password_1.get() != entry_password_2.get():
@@ -467,7 +492,6 @@ top_frame=None
 button_frame=None
 top_frame=None
 button_frame=None
-name_file_authors=r"authors_directory.csv"
 log_in_toplevel=None
 registration_toplevel=None
 entry_password_1=None
@@ -486,6 +510,7 @@ entry_frame=None
 users_settings={}
 logins_file="logins.txt"
 accounts_path="logins.csv"
+name_file_authors=r"authors_directory.csv"
 
 root=tk.Tk()
 root.title("история искусства")
