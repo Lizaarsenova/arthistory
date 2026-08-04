@@ -3,6 +3,7 @@ import tkinter as tk
 import os
 from PIL import Image, ImageTk
 import customtkinter as ctk
+import csv
 
 def create_main_window():
     global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label, main_frame_authors_button
@@ -337,9 +338,9 @@ def main():
     if users_settings["LOGGED_IN"]=="True":
         start()
     else:
-        button_log_in=tk.Button(entry_frame, text="войти", command=log_in, font=("Arial",25))
+        button_log_in=tk.Button(entry_frame, text="войти", command=log_in, font=("Arial",15))
         button_log_in.place(relheight=0.08, relwidth=0.2, relx=0.25, rely=0.1)
-        button_sign_up=tk.Button(entry_frame, text="зарегистрироваться", font=("Arial",25), command=registration)
+        button_sign_up=tk.Button(entry_frame, text="зарегистрироваться", font=("Arial",15), command=registration)
         button_sign_up.place(relheight=0.08, relwidth=0.2, relx=0.55, rely=0.1)
 
 def destroy_log_in_toplevel():
@@ -347,43 +348,50 @@ def destroy_log_in_toplevel():
     log_in_toplevel.destroy()
     main()
 
-def show_password():
+def show_password_1():
     global entry_password_1, password_check_box_1
     entry_password_1.configure(show="" if password_check_box_1.get() else "*")
+    
+def show_password_2():
+    global entry_password_2, password_check_box_2
+    entry_password_2.configure(show="" if password_check_box_2.get() else "*")
 
 def registration():
-    global registration_toplevel, entry_password_1, password_check_box_1
+    global registration_toplevel, entry_password_1, password_check_box_1, entry_password_2, password_check_box_2
     registration_toplevel=tk.Toplevel()
     registration_toplevel.title("регистрация")
-    registration_toplevel.geometry("1300x600+500+100")
+    registration_toplevel.geometry("900x600+300+100")
 
     back_to_main_button=tk.Button(registration_toplevel, text="назад", font=("Arial",25), command=destroy_registration_toplevel)
     back_to_main_button.place(relheight=0.08, relwidth=0.1, relx=0, rely=0)
 
     registration_label=tk.Label(registration_toplevel, text="регистрация", font=("Arial",25))
-    registration_label.place(relheight=0.1, relwidth=1, relx=0, rely=0.1)
+    registration_label.place(relheight=0.1, relwidth=0.3, relx=0.35, rely=0.05)
     
-    entry_login=ctk.CTkEntry(registration_toplevel, placeholder_text="Введите логин", font=("Arial",35))
+    entry_login=ctk.CTkEntry(registration_toplevel, placeholder_text="Введите логин", font=("Arial",20))
     entry_login.place(relheight=0.1, relwidth=0.7, rely=0.2, relx=0.15)
     # entry_login.bind("<KeyRelease>", login_control)
 
-    entry_password_1=ctk.CTkEntry(registration_toplevel, placeholder_text="Введите пароль", font=("Arial",35), show="*")
+    entry_password_1=ctk.CTkEntry(registration_toplevel, placeholder_text="Введите пароль", font=("Arial",20), show="*")
     entry_password_1.place(relheight=0.1, relwidth=0.7, rely=0.35, relx=0.15)
 
-    password_check_box_1=ctk.CTkCheckBox(registration_toplevel, text="", checkbox_height=60, checkbox_width=60, command=show_password, fg_color="#92C0DF", hover_color="#5972A0", border_color="#4B5A8B")
+    password_check_box_1=ctk.CTkCheckBox(registration_toplevel, text="", checkbox_height=60, checkbox_width=60, command=show_password_1, fg_color="#92C0DF", hover_color="#5972A0", border_color="#4B5A8B")
     password_check_box_1.place(relheight=0.1, relwidth=0.1, relx=0.85, rely=0.35)
 
     mistake_label=tk.Label(registration_toplevel, text="")
-    mistake_label.place(relheight=0.1, relwidth=1, rely=0.8, relx=0)
+    mistake_label.place(relheight=0.1, relwidth=1, rely=0.77, relx=0)
 
-    entry_password_2=ctk.CTkEntry(registration_toplevel, placeholder_text="Повторите пароль", font=("Arial",35), show="*")
+    entry_password_2=ctk.CTkEntry(registration_toplevel, placeholder_text="Повторите пароль", font=("Arial",20), show="*")
     entry_password_2.place(relheight=0.1, relwidth=0.7, rely=0.65, relx=0.15)
-    
-    registration_button=tk.Button(registration_toplevel, text="зарегистрироваться", font=("Arial",35), command=lambda: registre_control(entry_login, entry_password_1, entry_password_2, mistake_label))
-    registration_button.pack()
+
+    password_check_box_2=ctk.CTkCheckBox(registration_toplevel, text="", checkbox_height=60, checkbox_width=60, command=show_password_2, fg_color="#92C0DF", hover_color="#5972A0", border_color="#4B5A8B")
+    password_check_box_2.place(relheight=0.1, relwidth=0.1, relx=0.85, rely=0.65)
+
+    registration_button=tk.Button(registration_toplevel, text="зарегистрироваться", font=("Arial",20), command=lambda: registre_control(entry_login, entry_password_1, entry_password_2, mistake_label))
+    registration_button.place(relheight=0.1, relwidth=0.3, relx=0.35, rely=0.87)
      
-    rules_label=tk.Label(registration_toplevel, text="-не менее 8 символов\n-хотя бы одна заглавная буква", font=("Arial",15),fg="#5F5F5F", anchor="sw")
-    rules_label.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.45)
+    rules_label=tk.Label(registration_toplevel, text="~не менее 8 символов~\n~хотя бы одна заглавная буква~\n~наличие специальных символов~\n~наличие цифр~", font=("Arial",15),fg="#5F5F5F", anchor="n")
+    rules_label.place(relheight=0.18, relwidth=0.7, relx=0.15, rely=0.46)
 def destroy_registration_toplevel():
     global registration_topleve, log_in_toplevel
     registration_toplevel.destroy()
@@ -393,14 +401,14 @@ def destroy_registration_toplevel():
 def registre_control(entry_login, entry_password_1, entry_password_2, mistake_label):
 
     if entry_login.get()=="":
-        mistake_label.configure(text="заполните поле логина")
+        mistake_label.configure(text="заполните поле логина", font=("Arial",15))
         return
     if entry_password_1.get()=="":
-        mistake_label.configure(text="заполните поле пароля")
+        mistake_label.configure(text="заполните поле пароля", font=("Arial",15))
         return
-    # if entry_password_2.get()=="":
-    #     mistake_label.configure(text="заполните второе поле пароля")
-    #     return
+    if entry_password_2.get()=="":
+        mistake_label.configure(text="заполните второе поле пароля", font=("Arial",15))
+        return
     with open(accounts_path, "r", encoding="utf-8") as file:
         data=file.readlines()
     del data[0]
@@ -409,28 +417,30 @@ def registre_control(entry_login, entry_password_1, entry_password_2, mistake_la
 
     for i in data:
         i=i.strip().split(";")
+        if len(i)<2:
+            continue
         logins.update({i[0]:i[1]})
         print(i)
     print(logins)
 
     if entry_login.get() in logins:
-        mistake_label.configure(text="данный логин уже занят")
+        mistake_label.configure(text="данный логин уже занят", font=("Arial",15))
         entry_login.configure(text_color="red")
         return
 
     parol_1=entry_password_1.get()
-    if len(parol_1)<8:
-        mistake_label.configure(text="недостаточно символов")
-        return
-    if not any(i in "!#@$%&^*+"  for i in parol_1):
-        mistake_label.configure(text="нет специальных символов")
-        return
-    if not any(i in "1234567890"  for i in parol_1):
-        mistake_label.configure(text="нет цифр")
-        return
-    if not any(i.isupper() and i.isalpha()  for i in parol_1):
-        mistake_label.configure(text="нет заглавной буквы")
-        return
+    # if len(parol_1)<8:
+    #     mistake_label.configure(text="недостаточно символов",font=("Arial",15))
+    #     return
+    # if not any(i in "!#@$%&^*+№;:^&?()-_=~`{[]}"  for i in parol_1):
+    #     mistake_label.configure(text="нет специальных символов",font=("Arial",15))
+    #     return
+    # if not any(i in "1234567890"  for i in parol_1):
+    #     mistake_label.configure(text="нет цифр",font=("Arial",15))
+    #     return
+    # if not any(i.isupper() and i.isalpha()  for i in parol_1):
+    #     mistake_label.configure(text="нет заглавной буквы",font=("Arial",15))
+    #     return
     
 
     if  entry_password_1.get() != entry_password_2.get():
@@ -438,6 +448,11 @@ def registre_control(entry_login, entry_password_1, entry_password_2, mistake_la
         entry_password_2.configure(text_color="red")
         mistake_label.configure(text="Пароли не совпадают")
         return
+
+    with open("logins.csv", "a", newline="", encoding="utf-8") as file:
+        file.write(f"{entry_login.get()};{entry_password_2.get()}\n")   
+    registration_toplevel.destroy()
+    
 button_back=None
 button_1=None
 button_2=None
@@ -457,6 +472,8 @@ log_in_toplevel=None
 registration_toplevel=None
 entry_password_1=None
 password_check_box_1=None
+entry_password_2=None
+password_check_box_2=None
 
 main_frame_label=None
 main_frame_entry=None
@@ -472,7 +489,7 @@ accounts_path="logins.csv"
 
 root=tk.Tk()
 root.title("история искусства")
-root.geometry("2000x1100")
+root.geometry("1000x600")
 for i in range(12):
     root.columnconfigure(i, weight=1)
     root.rowconfigure(i, weight=1)
