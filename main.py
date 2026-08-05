@@ -37,16 +37,15 @@ def history_bar(event):
     history_scrollbar_canvas.create_window((0,0), window=history_frame, anchor="center")
     history_frame.bind("<Configure>", lambda x:history_scrollbar_canvas.configure(scrollregion=history_scrollbar_canvas.bbox("all")))
 
-    starts_with_history=any(i.startswith("HISTORY") for i in users_settings)
-    if users_settings["HISTORY_1"]=="" or not starts_with_history:
+    if users_settings["HISTORY_1"]=="" :
         history_scrollbar_frame.destroy()
         return
     else:
         history_list=list(users_settings.values())
         del history_list[:2]
         for j in history_list :
-            tk.Button(history_frame, text=j.capitalize(), font=("Arial",10), width=85, command=lambda arg=j :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
-
+            if j!="":
+                tk.Button(history_frame, text=j.capitalize(), font=("Arial",10), width=85, command=lambda arg=j :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
 
 def destroy_main_window():
     main_frame_authors_button.destroy()
@@ -319,7 +318,7 @@ def check_log_in(entry_login, entry_password, info_label, log_in_toplevel):
     if not os.path.isfile(accounts_path):
         info_label.config(text="Не удается установить соединение с базой данных")
         return
-    with open (accounts_path) as file:
+    with open(accounts_path, encoding="utf-8") as file:
         data=file.readlines()
     accounts={}
     del data[0]
@@ -338,7 +337,7 @@ def check_log_in(entry_login, entry_password, info_label, log_in_toplevel):
         
 
 def write_in_logins_txt():
-    with open(logins_file,"w") as file:
+    with open(logins_file,"w", encoding="utf-8") as file:
         for i in users_settings:
             file.write(f"{i}:{users_settings[i]}\n")
     
@@ -373,7 +372,7 @@ def main():
         button_no.place(relheight=0.1, relwidth=0.1, relx=0.5, rely=0.3)
         return
 
-    with open(logins_file) as file:
+    with open(logins_file, encoding="utf-8") as file:
         data=file.readlines()
     for i in data:
         i=i.strip().split(":")
