@@ -1,0 +1,7 @@
+./logins.txt
+./logins.csv
+
+./main.build/
+./main.dist/
+
+./venv/

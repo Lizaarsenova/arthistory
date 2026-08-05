@@ -3,11 +3,10 @@ import tkinter as tk
 import os
 from PIL import Image, ImageTk
 import customtkinter as ctk
-import csv
 
 def create_main_window():
     global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label, main_frame_authors_button
-    main_frame_label=tk.Label(root, text=f"Добро пожаловать, {users_settings["LOGIN"] if len(users_settings)!=0 and users_settings["LOGIN"]!="" else ""}!\nмое приложение", font=("Arial",40))
+    main_frame_label=tk.Label(root, text=f'Добро пожаловать, {users_settings["LOGIN"] if len(users_settings) != 0 and users_settings["LOGIN"] != "" else ""}!\nмое приложение', font=("Arial",40))
     main_frame_label.place(relheight=0.2, relwidth=0.7, relx=0.15, rely=0.2)
 
     main_frame_entry=ctk.CTkEntry(root, placeholder_text="Введите фамилию художника", font=("Arial",30))
@@ -109,7 +108,7 @@ def open_autors_frame():
         tk.Button(authors_frame, text=i.capitalize(), font=("Arial",30), width=85, command=lambda arg=i :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
         
 def create_author_window(author_slovar_name, author_slovar_text, logo_author, author_name, author_text):
-    global button_back,button_1, button_2, button_3, label_author, label_1, label_2, label_3, text_author, top_frame, button_frame, top_window_name
+    global top_frame, button_frame
 
     top_frame=tk.Frame(root)
     top_frame.place(relwidth=1, relheight=0.5, relx=0, rely=0)
@@ -133,8 +132,8 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
     button_frame_center=tk.Frame(button_frame)
     button_frame_center.place(relwidth=0.3333, relheight=1, relx=0.3333, rely=0)
 
-    buttton_frame_right=tk.Frame(button_frame)
-    buttton_frame_right.place(relwidth=0.3333, relheight=1, relx=0.66, rely=0)
+    button_frame_right=tk.Frame(button_frame)
+    button_frame_right.place(relwidth=0.3333, relheight=1, relx=0.66, rely=0)
 
     button_back=tk.Button(top_frame_left, text="назад",  font=("Arial",20), command=destroy_author_window)
     button_back.place(relwidth=0.2, relheight=0.1, relx=0, rely=0)
@@ -305,7 +304,6 @@ def search(surname=None):
         main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
         main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
         return           
-    
 
 def start():
     global entry_frame
@@ -332,15 +330,15 @@ def check_log_in(entry_login, entry_password, info_label, log_in_toplevel):
         users_settings["LOGGED_IN"]="True"
         write_in_logins_txt()
         start()
+        destroy_log_in_toplevel()
+        
     else:
         info_label.config(text="Неверные данные для входа", font=("Arial",35))
         
-
 def write_in_logins_txt():
     with open(logins_file,"w", encoding="utf-8") as file:
         for i in users_settings:
             file.write(f"{i}:{users_settings[i]}\n")
-    
     
 def log_in():
     global log_in_toplevel
@@ -359,6 +357,7 @@ def log_in():
 
     back_to_main_button=tk.Button(log_in_toplevel, text="назад", font=("Arial",25), command=destroy_log_in_toplevel)
     back_to_main_button.place(relheight=0.08, relwidth=0.1, relx=0, rely=0)
+
 def main():
     global entry_frame, users_settings
     entry_frame=tk.Frame(root)
@@ -389,7 +388,8 @@ def main():
 def destroy_log_in_toplevel():
     global log_in_toplevel
     log_in_toplevel.destroy()
-    main()
+    entry_frame.destroy()
+    # main()
 
 def show_password_1():
     global entry_password_1, password_check_box_1
@@ -435,10 +435,10 @@ def registration():
      
     rules_label=tk.Label(registration_toplevel, text="~не менее 8 символов~\n~хотя бы одна заглавная буква~\n~наличие специальных символов~\n~наличие цифр~", font=("Arial",15),fg="#5F5F5F", anchor="n")
     rules_label.place(relheight=0.18, relwidth=0.7, relx=0.15, rely=0.46)
+
 def destroy_registration_toplevel():
-    global registration_topleve, log_in_toplevel
+    global registration_toplevel
     registration_toplevel.destroy()
-    log_in_toplevel.destroy()
     main() 
 
 def registre_control(entry_login, entry_password_1, entry_password_2, mistake_label):
@@ -495,52 +495,57 @@ def registre_control(entry_login, entry_password_1, entry_password_2, mistake_la
     with open("logins.csv", "a", newline="", encoding="utf-8") as file:
         file.write(f"{entry_login.get()};{entry_password_2.get()}\n")   
     registration_toplevel.destroy()
-    
-button_back=None
-button_1=None
-button_2=None
-button_3=None
-button_author=None
-label_author=None
-label_1=None
-label_2=None
-label_3=None
-text_author=None
+
+def update_scale(event):
+    global fonts
+    # event.width
+
+# Main window elements 
+main_frame_button=None
+main_frame_fale_text=None
+main_frame_authors_button=None
+main_frame_label=None
+main_frame_entry=None
+
+# Window with buttons for authors
+all_authors_frame=None
+
+# Author frames (author window)
 top_frame=None
 button_frame=None
-top_frame=None
-button_frame=None
+
+# Frames for login and registration
 log_in_toplevel=None
 registration_toplevel=None
+
+# Cheking registration data
 entry_password_1=None
 password_check_box_1=None
 entry_password_2=None
 password_check_box_2=None
 
-main_frame_label=None
-main_frame_entry=None
-main_frame_button=None
-main_frame_fale_text=None
-main_frame_authors_button=None
-
-all_authors_frame=None
+# Window with choice log in or sign up 
 entry_frame=None
+
 users_settings={}
+
 logins_file="logins.txt"
 accounts_path="logins.csv"
 name_file_authors=r"authors_directory.csv"
 
+fonts = {'h1' : 40, 'h2' : 30, 'h3' : 0, 'h4' : 0, 'h5' : 0, 'h6' : 0, 'h7' : 0}
+base_width = 1000
+base_height = 600
+
 root=tk.Tk()
 root.title("история искусства")
 root.geometry("1000x600")
+root.bind('<Configure>', update_scale)
+
 for i in range(12):
     root.columnconfigure(i, weight=1)
     root.rowconfigure(i, weight=1)
 
-
-# create_main_window()
 main()
-
-
 root.mainloop()
 
