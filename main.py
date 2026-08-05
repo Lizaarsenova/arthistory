@@ -8,26 +8,45 @@ import csv
 def create_main_window():
     global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label, main_frame_authors_button
     main_frame_label=tk.Label(root, text=f"Добро пожаловать, {users_settings["LOGIN"] if len(users_settings)!=0 and users_settings["LOGIN"]!="" else ""}!\nмое приложение", font=("Arial",40))
-    main_frame_label.grid(row=3, column=0, columnspan=12, sticky="nsew", rowspan=2)
+    main_frame_label.place(relheight=0.2, relwidth=0.7, relx=0.15, rely=0.2)
 
-    main_frame_entry=ctk.CTkEntry(root, placeholder_text="Введите фамилию художника", font=("Arial",50))
-    main_frame_entry.grid(row=7, column=2, columnspan=7, sticky="nsew")
+    main_frame_entry=ctk.CTkEntry(root, placeholder_text="Введите фамилию художника", font=("Arial",30))
+    main_frame_entry.place(relheight=0.15, relwidth=0.7, relx=0.1, rely=0.5)
     main_frame_entry.bind("<Button-1>", history_bar )
 
-    main_frame_button=tk.Button(root, text="поиск", font=("Arial",30), command=search)
-    main_frame_button.grid(row=7, column=9, sticky="nsew")
+    main_frame_button=tk.Button(root, text="поиск", font=("Arial",25), command=search)
+    main_frame_button.place(relheight=0.15, relwidth=0.15, relx=0.8, rely=0.5)
 
     main_frame_authors_button=tk.Button(root,text="список авторов", font=("Arial",15), command=open_autors_frame)
-    main_frame_authors_button.grid(row=0, column=0, sticky="nw" )
+    main_frame_authors_button.place(relheight=0.07, relwidth=0.15, relx=0.01, rely=0.01)
 
 def history_bar(event):
-    history_scrollbar_frame=tk.Frame(root, bg="pink")
-    history_scrollbar_frame.place(relheight=0.1, relwidth=0.6, relx=0.2, rely=0.9)
-    history_scrollbar=tk.Scrollbar(history_scrollbar_frame, orient="vertical", bg="silver")
-    history_scrollbar.place(relheight=0.1, relwidth=0.01, relx=0.3, rely=0.8)
-    history_scrollbar_canvas=tk.Canvas(history_scrollbar_frame, bg="grey")
-    history_scrollbar_canvas.place(relheight=0.2, relwidth=0.7, relx=0.1, rely=0.2)
-    
+    history_scrollbar_frame=tk.Frame(root)
+    history_scrollbar_frame.place(relheight=0.15, relwidth=0.72, relx=0.08, rely=0.65)
+
+    history_scrollbar_canvas=tk.Canvas(history_scrollbar_frame)
+    history_scrollbar_canvas.place(relheight=0.9, relwidth=0.96, relx=0.033, rely=0.05)
+
+    history_scrollbar=tk.Scrollbar(history_scrollbar_frame, orient="vertical")
+    history_scrollbar.place(relheight=1, relwidth=0.03, relx=0, rely=0)
+
+    history_scrollbar_canvas.configure(yscrollcommand=history_scrollbar.set)
+    history_scrollbar.configure(command=history_scrollbar_canvas.yview)
+
+    history_frame=tk.Frame(history_scrollbar_canvas)
+    history_scrollbar_canvas.create_window((0,0), window=history_frame, anchor="center")
+    history_frame.bind("<Configure>", lambda x:history_scrollbar_canvas.configure(scrollregion=history_scrollbar_canvas.bbox("all")))
+
+    starts_with_history=any(i.startswith("HISTORY") for i in users_settings)
+    if users_settings["HISTORY_1"]=="" or not starts_with_history:
+        history_scrollbar_frame.destroy()
+        return
+    else:
+        history_list=list(users_settings.values())
+        del history_list[:2]
+        for j in history_list :
+            tk.Button(history_frame, text=j.capitalize(), font=("Arial",10), width=85, command=lambda arg=j :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
+
 
 def destroy_main_window():
     main_frame_authors_button.destroy()
@@ -72,7 +91,7 @@ def open_autors_frame():
 
     if not os.path.isfile(name_file_authors):
         main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
-        main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
+        main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
         return
 
     with open(name_file_authors, "r", encoding="utf-8") as file:
@@ -227,8 +246,8 @@ def search(surname=None):
     write_in_logins_txt()
 
     if not os.path.isfile(name_file_authors):
-        main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
-        main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
+        main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",20))
+        main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
         return
 
     with open(name_file_authors, "r", encoding="utf-8") as file:
@@ -246,14 +265,14 @@ def search(surname=None):
     if surname in slovar:
         if not os.path.isdir(slovar[surname]):
             main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
-            main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
+            main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
             return
         author_dir=slovar[surname]
         img_dir=author_dir+r"\images"
         config_author=author_dir+r"\config.csv"
         if not os.path.isdir(img_dir) or not os.path.isfile(config_author):
             main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
-            main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
+            main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
             return
         logo_author=None
         author_text=None
@@ -285,7 +304,7 @@ def search(surname=None):
 
     else:
         main_frame_fale_text=tk.Label(root, text="поиск не удался", font=("Arial",30))
-        main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
+        main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
         return           
     
 
