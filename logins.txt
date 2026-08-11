@@ -1,7 +1,7 @@
 LOGIN:admin
 LOGGED_IN:True
-HISTORY_1:куинджи
+HISTORY_1:
 HISTORY_2:репин
-HISTORY_3:репин
+HISTORY_3:куинджи
 HISTORY_4:репин
 HISTORY_5:репин

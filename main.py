@@ -19,6 +19,51 @@ def create_main_window():
     main_frame_authors_button=tk.Button(root,text="список авторов", font = fonts["h6"], command=open_autors_frame)
     main_frame_authors_button.place(relheight=0.07, relwidth=0.15, relx=0.01, rely=0.01)
 
+    filter_entry=ctk.CTkEntry(root, placeholder_text="Введите год", font=fonts["h6"])
+    filter_entry.place(relheight=0.07, relwidth=0.15, relx=0.01, rely=0.09)
+
+    filter_button=tk.Button(root, text="поиск", font=fonts["h6"], command=filter)
+    filter_button.place(relheight=0.06, relwidth=0.06, relx=0.1, rely=0.16)
+
+def filter():
+    destroy_main_window()
+    data_filter_frame=tk.Frame(root)
+    data_filter_frame.place(relwidth=1, relheight=1, relx=0, rely=0)
+    filter_canvas=tk.Canvas(all_authors_frame, bg="grey")
+    filter_canvas.place(relwidth=0.95, relheight=0.95, relx=0.05, rely=0.05)
+
+    filter_scrollbar=tk.Scrollbar(data_filter_frame, orient="vertical", bg="silver")
+    filter_scrollbar.place(relheight=0.95, relwidth=0.05, relx=0, rely=0.05)
+    filter_canvas.configure(yscrollcommand=filter_scrollbar.set)
+    filter_scrollbar.configure(command=filter_canvas.yview)
+    
+    button_back=tk.Button(data_filter_frame, text="назад",  font=fonts["h5"], command=destroy_filter_frame, anchor="center")
+    button_back.place(relwidth=0.05, relheight=0.05, relx=0, rely=0)
+
+    filter_frame=tk.Frame(filter_canvas)
+    filter_canvas.create_window((0,0), window=filter_frame, anchor="center")
+    filter_frame.bind("<Configure>", lambda x:filter_canvas.configure(scrollregion=filter_canvas.bbox("all")))
+
+    if not os.path.isfile(name_file_authors):
+            main_frame_fale_text=tk.Label(root, text="поиск не удался", font=fonts["h3"])
+            main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
+            return
+    
+    with open(name_file_authors, "r", encoding="utf-8") as file:
+        data=file.readlines()
+    del data[0]
+    
+    author_slovar={} 
+    
+    for i in data:
+        i=i.strip().split(";")
+        author_slovar[i[0]]=i[1]
+    
+    keys_author_slovar=list(author_slovar.keys())
+
+    
+    
+
 def history_bar(event):
     history_scrollbar_frame=tk.Frame(root)
     history_scrollbar_frame.place(relheight=0.15, relwidth=0.72, relx=0.08, rely=0.65)
@@ -58,6 +103,12 @@ def destroy_all_authors():
     global all_authors_frame
     if all_authors_frame!=None:
         all_authors_frame.destroy()
+    create_main_window()
+
+def destroy_filter_frame():
+    global data_filter_frame
+    if data_filter_frame!=None:
+        data_filter_frame.destroy()
     create_main_window()
 
 def destroy_author_window():
@@ -546,6 +597,7 @@ button_sign_up=None
 
 # Window with buttons for authors
 all_authors_frame=None
+data_filter_frame=None
 
 # Author frames (author window)
 top_frame=None
