@@ -101,14 +101,14 @@ def open_autors_frame():
     for i in data:
         i=i.strip().split(";")
         author_slovar[i[0]]=i[1]
-    # print(author_slovar)
+
     keys_author_slovar=list(author_slovar.keys())
-    # print(keys_author_slovar)
+    
     for i in keys_author_slovar:
         tk.Button(authors_frame, text=i.capitalize(), font=fonts["h3"], width=85, command=lambda arg=i :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
         
 def create_author_window(author_slovar_name, author_slovar_text, logo_author, author_name, author_text):
-    global top_frame, button_frame
+    global top_frame, button_frame, picture_height_base,picture_width_base
 
     top_frame=tk.Frame(root)
     top_frame.place(relwidth=1, relheight=0.5, relx=0, rely=0)
@@ -138,8 +138,8 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
     button_back=tk.Button(top_frame_left, text="назад",  font=fonts["h5"], command=destroy_author_window)
     button_back.place(relwidth=0.2, relheight=0.1, relx=0, rely=0)
 
-    pil_image_author=image_or_grey(logo_author, size=(picture_width,picture_height), color=(192,192, 192))
-    pil_image_author.thumbnail((picture_width,picture_height))
+    pil_image_author=image_or_grey(logo_author, size=(sizes["width"],sizes["height"]), color=(192,192, 192))
+    pil_image_author.thumbnail((sizes["width"],sizes["height"]), Image.Resampling.LANCZOS)
     image_author=ImageTk.PhotoImage(pil_image_author)
     label_author=tk.Label(top_frame_centre, image=image_author)
     label_author.image=image_author
@@ -147,24 +147,24 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
 
     keys_author_slovar=list(author_slovar_name.keys())
 
-    pil_image_1=image_or_grey(keys_author_slovar[0], size=(picture_width,picture_height), color=(192,192, 192))
-    pil_image_1.thumbnail((picture_width,picture_height))
+    pil_image_1=image_or_grey(keys_author_slovar[0], size=(sizes["width"],sizes["height"]), color=(192,192, 192))
+    pil_image_1.thumbnail((sizes["width"],sizes["height"]), Image.Resampling.LANCZOS)
     image_1=ImageTk.PhotoImage(pil_image_1)
     image_1.pil_base=pil_image_1
     label_1=tk.Label(button_frame_left, image=image_1)
     label_1.image=image_1
     label_1.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
-    pil_image_2=image_or_grey(keys_author_slovar[1], size=(picture_width,picture_height), color=(192,192, 192))
-    pil_image_2.thumbnail((picture_width,picture_height))
+    pil_image_2=image_or_grey(keys_author_slovar[1], size=(sizes["width"],sizes["height"]), color=(192,192, 192))
+    pil_image_2.thumbnail((sizes["width"],sizes["height"]), Image.Resampling.LANCZOS)
     image_2=ImageTk.PhotoImage(pil_image_2)
     image_2.pil_base=pil_image_2
     label_2=tk.Label(button_frame_center, image=image_2)
     label_2.image=image_2
     label_2.place(relwidth=0.8, relheight=0.8, relx=0.1, rely=0.05)
 
-    pil_image_3=image_or_grey(keys_author_slovar[2], size=(picture_width,picture_height), color=(192,192, 192))
-    pil_image_3.thumbnail((picture_width,picture_height))
+    pil_image_3=image_or_grey(keys_author_slovar[2], size=(sizes["width"],sizes["height"]), color=(192,192, 192))
+    pil_image_3.thumbnail((sizes["width"],sizes["height"]), Image.Resampling.LANCZOS)
     image_3=ImageTk.PhotoImage(pil_image_3)
     image_3.pil_base=pil_image_3
     label_3=tk.Label(button_frame_right, image=image_3)
@@ -185,9 +185,9 @@ def create_author_window(author_slovar_name, author_slovar_text, logo_author, au
     name_3=tk.Label(button_frame_right, text=author_slovar_name[keys_author_slovar[2]],  font=fonts["h7"], wraplength=1000, anchor="s")
     name_3.place(relwidth=0.9, relheight=0.1, relx=0.05, rely=0)
 
-    text_name_author=tk.Label(top_frame_right, text=author_name, font=fonts["h5"], wraplength=600, anchor="s")
+    text_name_author=tk.Label(top_frame_right, text=author_name, font=fonts["h5"], wraplength=400, anchor="s")
     text_name_author.place(relwidth=1, relheight=0.2, relx=0, rely=0)
-    text_author=tk.Label(top_frame_right, text=author_text, font=fonts["h6"], wraplength=600)
+    text_author=tk.Label(top_frame_right, text=author_text, font=fonts["h6"], wraplength=400)
     text_author.place(relwidth=1, relheight=0.8, relx=0, rely=0.2)
 
 def image_or_grey(image_path, size, color):
@@ -227,6 +227,8 @@ def create_top_window_for_picture(top_window_picture, top_window_name, top_windo
 
 def update_history(users_settings):
     global main_frame_entry
+    if not main_frame_entry.winfo_exists():
+        return
     if users_settings["HISTORY_1"]=="":
         users_settings["HISTORY_1"]=main_frame_entry.get()
     elif users_settings["HISTORY_1"]!="":
@@ -235,7 +237,7 @@ def update_history(users_settings):
         users_settings["HISTORY_3"]=users_settings["HISTORY_2"]
         users_settings["HISTORY_2"]=users_settings["HISTORY_1"]
         users_settings["HISTORY_1"]=main_frame_entry.get()
-    print(users_settings)
+    
 
 def search(surname=None):
     global main_frame_fale_text
@@ -259,7 +261,7 @@ def search(surname=None):
         slovar[i[0]]=i[1]
     if surname==None:
         surname=main_frame_entry.get().strip().lower()
-    # print(slovar)
+    
     if surname in slovar:
         if not os.path.isdir(slovar[surname]):
             main_frame_fale_text=tk.Label(root, text="поиск не удался", font=fonts["h3"])
@@ -276,7 +278,7 @@ def search(surname=None):
         author_text=None
         with open(config_author, "r", encoding="utf-8") as file:
             data=file.readlines()
-        # print(data)
+        
         author_slovar_name={}
         author_slovar_text={}
         for i in data:
@@ -285,8 +287,7 @@ def search(surname=None):
                 logo_author=i[1]
                 author_name=i[2]
                 author_text=i[3]
-                # print("AUTHOR LOGO", logo_author)
-                # print("AUTHOR TEXT", author_text)
+        
             elif i[0]=="2":
                 author_slovar_name[i[1]]=i[2]
                 author_slovar_text[i[1]]=i[3]
@@ -380,7 +381,7 @@ def main():
     for i in data:
         i=i.strip().split(":")
         users_settings[i[0]]=i[1]
-    # print(users_settings)
+    
     if users_settings["LOGGED_IN"]=="True":
         start()
     else:
@@ -477,8 +478,8 @@ def registre_control(entry_login, entry_password_1, entry_password_2, mistake_la
         if len(i)<2:
             continue
         logins.update({i[0]:i[1]})
-        print(i)
-    print(logins)
+        
+    
 
     if entry_login.get() in logins:
         mistake_label.configure(text="данный логин уже занят", font=fonts["h6"])
@@ -517,10 +518,23 @@ def update_scale(event):
     for i in fonts:
         font_name=fonts_base[i][0]
         base_size=fonts_base[i][1]
-        new_size=max(1, int(base_size*(scale_cf**0.5)))
+        new_size=max(1, int(base_size*(scale_cf)))
         fonts[i]=(font_name, new_size)
-    print(scale_cf)
 
+    
+        picture_width_base=530
+        picture_height_base=430
+
+        picture_width_new=int(picture_width_base*scale_cf)
+        picture_height_new=int(picture_height_base*scale_cf)
+
+        picture_width_new=max(1, min(picture_width_new, picture_width_base))
+        picture_height_new=max(1, min(picture_height_new, picture_height_base))
+        sizes["height"]= picture_height_new
+        sizes["width"]=picture_width_new
+
+
+        
 # Main window elements 
 main_frame_button=None
 main_frame_fale_text=None
@@ -560,8 +574,7 @@ fonts = {'h1' : ("Arial",40), 'h2' : ("Arial", 35), 'h3' : ("Arial", 30), 'h4' :
 fonts_base = {'h1' : ("Arial",40), 'h2' : ("Arial", 35), 'h3' : ("Arial", 30), 'h4' : ("Arial", 25), 'h5' : ("Arial", 20), 'h6' : ("Arial", 15), 'h7' : ("Arial", 10)}
 base_width = 2000
 base_height = 600
-picture_width=530
-picture_height=430
+sizes={"width" : 530, "height" : 430}
 root=tk.Tk()
 root.title("история искусства")
 root.geometry("1200x600")

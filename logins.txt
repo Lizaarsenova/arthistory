@@ -1,6 +1,6 @@
 LOGIN:admin
 LOGGED_IN:True
-HISTORY_1:
+HISTORY_1:куинджи
 HISTORY_2:репин
 HISTORY_3:репин
 HISTORY_4:репин
