@@ -5,8 +5,8 @@ from PIL import Image, ImageTk
 import customtkinter as ctk
 
 def create_main_window():
-    global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label, main_frame_authors_button
-    main_frame_label=tk.Label(root, text=f'Добро пожаловать, {users_settings["LOGIN"] if len(users_settings) != 0 and users_settings["LOGIN"] != "" else ""}!\nмое приложение', font=fonts["h1"])
+    global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label, main_frame_authors_button, filter_entry
+    main_frame_label=tk.Label(root, text=f'Добро пожаловать {","+users_settings["LOGIN"] if len(users_settings) != 0 and users_settings["LOGIN"] != "" else ""}!\nмое приложение', font=fonts["h1"])
     main_frame_label.place(relheight=0.2, relwidth=0.7, relx=0.15, rely=0.2)
 
     main_frame_entry=ctk.CTkEntry(root, placeholder_text="Введите фамилию художника", font = fonts["h3"])
@@ -26,10 +26,11 @@ def create_main_window():
     filter_button.place(relheight=0.06, relwidth=0.06, relx=0.1, rely=0.16)
 
 def filter():
+    global data_filter_frame, filter_entry
     destroy_main_window()
     data_filter_frame=tk.Frame(root)
     data_filter_frame.place(relwidth=1, relheight=1, relx=0, rely=0)
-    filter_canvas=tk.Canvas(all_authors_frame, bg="grey")
+    filter_canvas=tk.Canvas(data_filter_frame, bg="grey")
     filter_canvas.place(relwidth=0.95, relheight=0.95, relx=0.05, rely=0.05)
 
     filter_scrollbar=tk.Scrollbar(data_filter_frame, orient="vertical", bg="silver")
@@ -44,27 +45,51 @@ def filter():
     filter_canvas.create_window((0,0), window=filter_frame, anchor="center")
     filter_frame.bind("<Configure>", lambda x:filter_canvas.configure(scrollregion=filter_canvas.bbox("all")))
 
+
     if not os.path.isfile(name_file_authors):
-            main_frame_fale_text=tk.Label(root, text="поиск не удался", font=fonts["h3"])
-            main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
-            return
+        main_frame_fale_text=tk.Label(data_filter_frame, text="поиск не удался", font=fonts["h3"])
+        main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
+        return
     
+    year=str(filter_entry.get()).strip()
+
+    if not year:
+        main_frame_fale_text=tk.Label(data_filter_frame, text="поиск не удался", font=fonts["h3"])
+        main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
+        return
+
+    okey_authors=[]
+
     with open(name_file_authors, "r", encoding="utf-8") as file:
-        data=file.readlines()
-    del data[0]
-    
-    author_slovar={} 
-    
+        data=file.readlines()[1:]
+
     for i in data:
-        i=i.strip().split(";")
-        author_slovar[i[0]]=i[1]
-    
-    keys_author_slovar=list(author_slovar.keys())
+        name, path=i.strip().split(";")
+
+        with open(f"{path}/config.csv", "r", encoding="utf-8") as csv_file:
+            if year in csv_file.read():
+                okey_authors.append(name)
+
+    if not okey_authors:
+        main_frame_fale_text=tk.Label(data_filter_frame, text="поиск не удался", font=fonts["h3"])
+        main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
+        return
+
+    button_width=filter_canvas.cget("width")
+        
+    for i in okey_authors:    
+        tk.Button(filter_frame, text=i.capitalize(), font=fonts["h6"], width=button_width, command=lambda arg=i :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
+
+
 
     
     
 
 def history_bar(event):
+    global main_frame_entry
+
+    button_width=main_frame_entry.cget("width")
+
     history_scrollbar_frame=tk.Frame(root)
     history_scrollbar_frame.place(relheight=0.15, relwidth=0.72, relx=0.08, rely=0.65)
 
@@ -89,7 +114,7 @@ def history_bar(event):
         del history_list[:2]
         for j in history_list :
             if j!="":
-                tk.Button(history_frame, text=j.capitalize(), font=fonts["h7"], width=85, command=lambda arg=j :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
+                tk.Button(history_frame, text=j.capitalize(), font=fonts["h6"], width=button_width, command=lambda arg=j :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
 
 def destroy_main_window():
     main_frame_authors_button.destroy()
@@ -112,11 +137,14 @@ def destroy_filter_frame():
     create_main_window()
 
 def destroy_author_window():
-    global top_frame, button_frame
+    global top_frame, button_frame, data_filter_frame
     top_frame.destroy()
     button_frame.destroy()
     destroy_all_authors()
+    if data_filter_frame!=None:
+        data_filter_frame.destroy()
     create_main_window()
+    
 
 def open_autors_frame():
     global all_authors_frame
@@ -414,10 +442,17 @@ def main():
     global entry_frame, users_settings
     entry_frame=tk.Frame(root)
     entry_frame.place(relheight=1,relwidth=1,relx=0,rely=0)
+
     if not os.path.exists(accounts_path):
         with open("logins.csv", "w", encoding="utf-8") as f:
             f.write("login;password\n")
             return
+
+    if not os.path.exists(logins_file):
+            with open(logins_file, "w", encoding="utf-8") as f:
+                f.write("LOGIN:\nLOGGED_IN:False\nHISTORY_1:\nHISTORY_2:\nHISTORY_3:\nHISTORY_4:\nHISTORY_5:\n")
+                return
+                
     if not os.path.isfile(logins_file):
         fale_label=tk.Label(entry_frame, text="На данный момент авторизация/регистрация невозможна.\nПродолжить без входа в аккаунт?", font=fonts["h4"])
         fale_label.place(relheight=0.3, relwidth=0.9, relx=0.05, rely=0.1)
@@ -455,7 +490,7 @@ def destroy_log_in_toplevel():
     global log_in_toplevel
     log_in_toplevel.destroy()
     entry_frame.destroy()
-    # main()
+    main()
 
 def show_password_1():
     global entry_password_1, password_check_box_1
@@ -594,6 +629,7 @@ main_frame_label=None
 main_frame_entry=None
 button_log_in=None
 button_sign_up=None
+filter_entry=None
 
 # Window with buttons for authors
 all_authors_frame=None
