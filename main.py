@@ -6,12 +6,13 @@ import customtkinter as ctk
 
 def create_main_window():
     global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label, main_frame_authors_button, filter_entry
-    main_frame_label=tk.Label(root, text=f'Добро пожаловать {","+users_settings["LOGIN"] if len(users_settings) != 0 and users_settings["LOGIN"] != "" else ""}!\nмое приложение', font=fonts["h1"])
+    main_frame_label=tk.Label(root, text=f'Добро пожаловать{", "+users_settings["LOGIN"] if len(users_settings) != 0 and users_settings["LOGIN"] != "" else ""}!\nмое приложение', font=fonts["h1"])
     main_frame_label.place(relheight=0.2, relwidth=0.7, relx=0.15, rely=0.2)
 
     main_frame_entry=ctk.CTkEntry(root, placeholder_text="Введите фамилию художника", font = fonts["h3"])
     main_frame_entry.place(relheight=0.15, relwidth=0.7, relx=0.1, rely=0.5)
-    main_frame_entry.bind("<Button-1>", history_bar )
+    main_frame_entry.bind("<Button-1>", open_history)
+    root.bind("<Button-1 >", hide_history)
 
     main_frame_button=tk.Button(root, text="поиск", font = fonts["h4"], command=search)
     main_frame_button.place(relheight=0.15, relwidth=0.15, relx=0.8, rely=0.5)
@@ -30,7 +31,7 @@ def filter():
     destroy_main_window()
     data_filter_frame=tk.Frame(root)
     data_filter_frame.place(relwidth=1, relheight=1, relx=0, rely=0)
-    filter_canvas=tk.Canvas(data_filter_frame, bg="grey")
+    filter_canvas=tk.Canvas(data_filter_frame)
     filter_canvas.place(relwidth=0.95, relheight=0.95, relx=0.05, rely=0.05)
 
     filter_scrollbar=tk.Scrollbar(data_filter_frame, orient="vertical", bg="silver")
@@ -42,7 +43,7 @@ def filter():
     button_back.place(relwidth=0.05, relheight=0.05, relx=0, rely=0)
 
     filter_frame=tk.Frame(filter_canvas)
-    filter_canvas.create_window((0,0), window=filter_frame, anchor="center")
+    filter_canvas_window=filter_canvas.create_window((0,0), window=filter_frame, anchor="center")
     filter_frame.bind("<Configure>", lambda x:filter_canvas.configure(scrollregion=filter_canvas.bbox("all")))
 
 
@@ -75,7 +76,12 @@ def filter():
         main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
         return
 
-    button_width=filter_canvas.cget("width")
+    def fix_width(event):
+        filter_canvas.itemconfig(filter_canvas_window, width=event.width)
+
+    filter_canvas.bind("<Configure>", fix_width)
+
+    button_width=int(filter_frame.cget("width"))
         
     for i in okey_authors:    
         tk.Button(filter_frame, text=i.capitalize(), font=fonts["h6"], width=button_width, command=lambda arg=i :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
@@ -86,9 +92,10 @@ def filter():
     
 
 def history_bar(event):
-    global main_frame_entry
+    global main_frame_entry, history_scrollbar_frame
 
-    button_width=main_frame_entry.cget("width")
+    if history_scrollbar_frame is not None:
+        return
 
     history_scrollbar_frame=tk.Frame(root)
     history_scrollbar_frame.place(relheight=0.15, relwidth=0.72, relx=0.08, rely=0.65)
@@ -106,6 +113,8 @@ def history_bar(event):
     history_scrollbar_canvas.create_window((0,0), window=history_frame, anchor="center")
     history_frame.bind("<Configure>", lambda x:history_scrollbar_canvas.configure(scrollregion=history_scrollbar_canvas.bbox("all")))
 
+    button_width=main_frame_entry.cget("width")
+
     if users_settings["HISTORY_1"]=="" :
         history_scrollbar_frame.destroy()
         return
@@ -114,7 +123,31 @@ def history_bar(event):
         del history_list[:2]
         for j in history_list :
             if j!="":
+                def click(arg=j):
+                    global history_scrollbar_frame
+                    if history_scrollbar_frame is not None:
+                        history_scrollbar_frame.destroy()
+                    history_scrollbar_frame=None
+                    search(arg)
                 tk.Button(history_frame, text=j.capitalize(), font=fonts["h6"], width=button_width, command=lambda arg=j :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
+
+    main_frame_entry.focus_set()
+
+def hide_history(event):
+    global main_frame_entry, history_scrollbar_frame
+
+    if history_scrollbar_frame is None:
+        return
+    
+    widget=event.widget
+
+    if widget == main_frame_entry or widget.master == main_frame_entry:
+        return
+    if str(widget).startswith(str(history_scrollbar_frame)):
+        return
+    if history_scrollbar_frame.winfo_exists():
+        history_scrollbar_frame.destroy()
+    history_scrollbar_frame=None
 
 def destroy_main_window():
     main_frame_authors_button.destroy()
@@ -137,12 +170,14 @@ def destroy_filter_frame():
     create_main_window()
 
 def destroy_author_window():
-    global top_frame, button_frame, data_filter_frame
+    global top_frame, button_frame, data_filter_frame, history_scrollbar_frame
     top_frame.destroy()
     button_frame.destroy()
     destroy_all_authors()
     if data_filter_frame!=None:
         data_filter_frame.destroy()
+
+    history_scrollbar_frame = None
     create_main_window()
     
 
@@ -151,7 +186,7 @@ def open_autors_frame():
     destroy_main_window()
     all_authors_frame=tk.Frame(root)
     all_authors_frame.place(relwidth=1, relheight=1, relx=0, rely=0)
-    authors_canvas=tk.Canvas(all_authors_frame, bg="grey")
+    authors_canvas=tk.Canvas(all_authors_frame)
     authors_canvas.place(relwidth=0.95, relheight=0.95, relx=0.05, rely=0.05)
     
     authors_scrollbar=tk.Scrollbar(all_authors_frame, orient="vertical", bg="silver")
@@ -163,12 +198,12 @@ def open_autors_frame():
     button_back.place(relwidth=0.05, relheight=0.05, relx=0, rely=0)
 
     authors_frame=tk.Frame(authors_canvas)
-    authors_canvas.create_window((0,0), window=authors_frame, anchor="center")
+    canvas_window=authors_canvas.create_window((0,0), window=authors_frame, anchor="nw")
     authors_frame.bind("<Configure>", lambda x:authors_canvas.configure(scrollregion=authors_canvas.bbox("all")))
 
     if not os.path.isfile(name_file_authors):
-        main_frame_fale_text=tk.Label(root, text="поиск не удался", font=fonts["h3"])
-        main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
+        main_frame_fale_text=tk.Label(all_authors_frame, text="возникла ошибка, поиск не удался", font=fonts["h1"])
+        main_frame_fale_text.place(relheight=0.3, relwidth=0.7, relx=0.15, rely=0.3)
         return
 
     with open(name_file_authors, "r", encoding="utf-8") as file:
@@ -182,9 +217,16 @@ def open_autors_frame():
         author_slovar[i[0]]=i[1]
 
     keys_author_slovar=list(author_slovar.keys())
-    
+
+    button_width=authors_frame.cget("width")
+
+    def fix_width(event):
+        authors_canvas.itemconfig(canvas_window, width=event.width)
+
+    authors_canvas.bind("<Configure>", fix_width)
+
     for i in keys_author_slovar:
-        tk.Button(authors_frame, text=i.capitalize(), font=fonts["h3"], width=85, command=lambda arg=i :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
+        tk.Button(authors_frame, text=i.capitalize(), font=fonts["h3"], width=button_width, command=lambda arg=i :search(arg)).pack(fill="x", padx=5, pady=5, anchor="center")
         
 def create_author_window(author_slovar_name, author_slovar_text, logo_author, author_name, author_text):
     global top_frame, button_frame, picture_height_base,picture_width_base
@@ -316,16 +358,34 @@ def update_history(users_settings):
         users_settings["HISTORY_3"]=users_settings["HISTORY_2"]
         users_settings["HISTORY_2"]=users_settings["HISTORY_1"]
         users_settings["HISTORY_1"]=main_frame_entry.get()
+
+def clear_fale_text(event):
+    global main_frame_fale_text, main_frame_entry
+    if main_frame_fale_text is not None:
+        if main_frame_fale_text.winfo_exists():
+            main_frame_fale_text.destroy()
+            main_frame_fale_text=None 
+    if main_frame_entry.get()!="":
+        main_frame_entry.delete(0,"end")
+
+def open_history(event):
+    clear_fale_text(event)
+    history_bar(event)
     
 
 def search(surname=None):
-    global main_frame_fale_text
+    global main_frame_fale_text, history_scrollbar_frame
+
+    if history_scrollbar_frame is not None:
+        if history_scrollbar_frame.winfo_exists():
+            history_scrollbar_frame.destroy()
+    history_scrollbar_frame=None
 
     update_history(users_settings)
     write_in_logins_txt()
 
     if not os.path.isfile(name_file_authors):
-        main_frame_fale_text=tk.Label(root, text="поиск не удался", font=fonts["h5"])
+        main_frame_fale_text=tk.Label(root, text="возникла ошибка, поиск не удался", font=fonts["h5"])
         main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
         return
 
@@ -345,13 +405,15 @@ def search(surname=None):
         if not os.path.isdir(slovar[surname]):
             main_frame_fale_text=tk.Label(root, text="поиск не удался", font=fonts["h3"])
             main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
+            main_frame_fale_text.bind("<Button-1>", clear_fale_text)
             return
         author_dir=slovar[surname]
         img_dir=author_dir+r"\images"
         config_author=author_dir+r"\config.csv"
         if not os.path.isdir(img_dir) or not os.path.isfile(config_author):
-            main_frame_fale_text=tk.Label(root, text="поиск не удался", font=fonts["h3"])
+            main_frame_fale_text=tk.Label(root, text="возникла ошибка, поиск не удался", font=fonts["h3"])
             main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
+            main_frame_fale_text.bind("<Button-1>", clear_fale_text)
             return
         logo_author=None
         author_text=None
@@ -373,6 +435,7 @@ def search(surname=None):
         if not logo_author or not author_text or not len(author_slovar_name)==3 or not len(author_slovar_text)==3:
             main_frame_fale_text=tk.Label(root, text="повреждены данные", font=fonts["h3"])
             main_frame_fale_text.grid(row=9, column=0,  columnspan=12, sticky="nsew")
+            main_frame_fale_text.bind("<Button-1>", clear_fale_text)
             return   
         destroy_main_window()
         destroy_all_authors()
@@ -383,6 +446,7 @@ def search(surname=None):
     else:
         main_frame_fale_text=tk.Label(root, text="поиск не удался", font=fonts["h3"])
         main_frame_fale_text.place(relheight=0.1, relwidth=0.7, relx=0.15, rely=0.85)
+        main_frame_fale_text.bind("<Button-1>", clear_fale_text)
         return           
 
 def start():
@@ -402,6 +466,8 @@ def check_log_in(entry_login, entry_password, info_label, log_in_toplevel):
     del data[0]
     for i in data:
         i=i.strip().split(";")
+        if len(i)<2:
+            continue
         accounts[i[0]]=i[1]
     
     if login in accounts and password==accounts[login]:
@@ -440,15 +506,21 @@ def log_in():
 
 def main():
     global entry_frame, users_settings
+
+    # history_file_control()
     entry_frame=tk.Frame(root)
     entry_frame.place(relheight=1,relwidth=1,relx=0,rely=0)
 
     if not os.path.exists(accounts_path):
-        with open("logins.csv", "w", encoding="utf-8") as f:
+        fale_label=tk.Label(entry_frame, text="перезапустите программу", font=fonts["h4"])
+        fale_label.place(relheight=0.3, relwidth=0.9, relx=0.05, rely=0.1)
+        with open(accounts_path, "w", encoding="utf-8") as f:
             f.write("login;password\n")
             return
 
     if not os.path.exists(logins_file):
+            fale_label=tk.Label(entry_frame, text="перезапустите программу", font=fonts["h4"])
+            fale_label.place(relheight=0.3, relwidth=0.9, relx=0.05, rely=0.1)
             with open(logins_file, "w", encoding="utf-8") as f:
                 f.write("LOGIN:\nLOGGED_IN:False\nHISTORY_1:\nHISTORY_2:\nHISTORY_3:\nHISTORY_4:\nHISTORY_5:\n")
                 return
@@ -476,7 +548,7 @@ def main():
         button_sign_up=tk.Button(entry_frame, text="зарегистрироваться", font=fonts["h6"], command=registration)
         button_sign_up.place(relheight=0.08, relwidth=0.2, relx=0.55, rely=0.1)
 
-    if not os.path.exists("authors"):
+    if not os.path.isdir("authors"):
         entry_frame.destroy()
         mistake_label_1=tk.Label(root, text="Дальнейшая работа приложения невозможна", font=fonts["h3"], fg="red")
         mistake_label_1.place(relheight=0.3, relwidth=1, relx=0, rely=0.3)
@@ -514,7 +586,6 @@ def registration():
     
     entry_login=ctk.CTkEntry(registration_toplevel, placeholder_text="Введите логин", font=fonts["h5"])
     entry_login.place(relheight=0.1, relwidth=0.7, rely=0.2, relx=0.15)
-    # entry_login.bind("<KeyRelease>", login_control)
 
     entry_password_1=ctk.CTkEntry(registration_toplevel, placeholder_text="Введите пароль", font=fonts["h5"], show="*")
     entry_password_1.place(relheight=0.1, relwidth=0.7, rely=0.35, relx=0.15)
@@ -565,7 +636,7 @@ def registre_control(entry_login, entry_password_1, entry_password_2, mistake_la
             continue
         logins.update({i[0]:i[1]})
         
-    
+    entry_login.configure(text_color="black")
 
     if entry_login.get() in logins:
         mistake_label.configure(text="данный логин уже занят", font=fonts["h6"])
@@ -573,17 +644,21 @@ def registre_control(entry_login, entry_password_1, entry_password_2, mistake_la
         return
 
     parol_1=entry_password_1.get()
+
+    entry_password_1.configure(text_color="black")
+    entry_password_2.configure(text_color="black")
+
     if len(parol_1)<8:
-        mistake_label.configure(text="недостаточно символов",font=fonts["h6"])
+        mistake_label.configure(text="недостаточно символов в пароле",font=fonts["h6"])
         return
     if not any(i in "!#@$%&^*+№;:^&?()-_=~`{[]}"  for i in parol_1):
-        mistake_label.configure(text="нет специальных символов",font=fonts["h6"])
+        mistake_label.configure(text="нет специальных символов в пароле",font=fonts["h6"])
         return
     if not any(i in "1234567890"  for i in parol_1):
-        mistake_label.configure(text="нет цифр",font=fonts["h6"])
+        mistake_label.configure(text="нет цифр в пароле",font=fonts["h6"])
         return
     if not any(i.isupper() and i.isalpha()  for i in parol_1):
-        mistake_label.configure(text="нет заглавной буквы",font=fonts["h6"])
+        mistake_label.configure(text="нет заглавной буквы в пароле",font=fonts["h6"])
         return
     
 
@@ -630,6 +705,7 @@ main_frame_entry=None
 button_log_in=None
 button_sign_up=None
 filter_entry=None
+history_scrollbar_frame=None
 
 # Window with buttons for authors
 all_authors_frame=None
