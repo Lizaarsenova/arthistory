@@ -6,8 +6,8 @@ import customtkinter as ctk
 
 def create_main_window():
     global main_frame_button, main_frame_entry, main_frame_fale_text, main_frame_label, main_frame_authors_button, filter_entry
-    main_frame_label=tk.Label(root, text=f'Добро пожаловать{", "+users_settings["LOGIN"] if len(users_settings) != 0 and users_settings["LOGIN"] != "" else ""}!\nмое приложение', font=fonts["h1"])
-    main_frame_label.place(relheight=0.2, relwidth=0.7, relx=0.15, rely=0.2)
+    main_frame_label=tk.Label(root, text=f'Добро пожаловать{", "+users_settings["LOGIN"] if len(users_settings) != 0 and users_settings["LOGIN"] != "" else ""}!\nмое приложение\n"История русского искусства"', font=fonts["h1"])
+    main_frame_label.place(relheight=0.3, relwidth=0.7, relx=0.15, rely=0.1)
 
     main_frame_entry=ctk.CTkEntry(root, placeholder_text="Введите фамилию художника", font = fonts["h3"])
     main_frame_entry.place(relheight=0.15, relwidth=0.7, relx=0.1, rely=0.5)
@@ -25,6 +25,17 @@ def create_main_window():
 
     filter_button=tk.Button(root, text="поиск", font=fonts["h6"], command=filter)
     filter_button.place(relheight=0.06, relwidth=0.06, relx=0.1, rely=0.16)
+
+    log_out_button=tk.Button(root, text="выйти", font=fonts["h6"], bg="#ABBDE3", command=log_out)
+    log_out_button.place(relheight=0.06, relwidth=0.08, relx=0.9, rely=0.01)
+
+def log_out():
+    write_in_logins_txt()
+    os.remove(logins_file) 
+    with open("logins.txt", "w", encoding="utf-8") as file:
+        file.write("LOGIN:\nLOGGED_IN:False\nHISTORY_1:\nHISTORY_2:\nHISTORY_3:\nHISTORY_4:\nHISTORY_5:\n")
+    destroy_main_window()
+    main()                    
 
 def filter():
     global data_filter_frame, filter_entry
@@ -524,15 +535,6 @@ def main():
             with open(logins_file, "w", encoding="utf-8") as f:
                 f.write("LOGIN:\nLOGGED_IN:False\nHISTORY_1:\nHISTORY_2:\nHISTORY_3:\nHISTORY_4:\nHISTORY_5:\n")
                 return
-                
-    if not os.path.isfile(logins_file):
-        fale_label=tk.Label(entry_frame, text="На данный момент авторизация/регистрация невозможна.\nПродолжить без входа в аккаунт?", font=fonts["h4"])
-        fale_label.place(relheight=0.3, relwidth=0.9, relx=0.05, rely=0.1)
-        button_yes=tk.Button(entry_frame, text="да", command=start, font=fonts["h2"], bg="#79D196")
-        button_yes.place(relheight=0.1, relwidth=0.1, relx=0.4, rely=0.3)
-        button_no=tk.Button(entry_frame, text="нет", command=root.destroy, font=fonts["h2"], bg="#E2A3A3")
-        button_no.place(relheight=0.1, relwidth=0.1, relx=0.5, rely=0.3)
-        return
 
     with open(logins_file, encoding="utf-8") as file:
         data=file.readlines()
